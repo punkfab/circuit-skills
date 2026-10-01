@@ -98,7 +98,7 @@ def main():
         if shown: print(f'   {shown:4d} {t}')
 
     blocking = (len(court) + len(real_short) + len(false_short)
-                + by.get('tracks_crossing',0) + len(edge_real))
+                + by.get('tracks_crossing',0) + len(edge_real) + unconn)  # an open net is not CLEAN
     print(f"\nSUMMARY: placement={len(court)} real-shorts={len(real_short)} "
           f"false-shorts={len(false_short)} crossings={by.get('tracks_crossing',0)} "
           f"edge-over-cut={len(edge_real)} unconnected={unconn} | cosmetic={cos_total}")

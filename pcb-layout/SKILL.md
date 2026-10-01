@@ -229,7 +229,9 @@ PLACEMENT*, not one long route:
   step, once placement is good — not the iteration step.
 - **The measure is `drc_check.py`** — it sorts DRC into **PLACEMENT** (courtyard overlaps → fix pcbX/pcbY),
   **ROUTING** (real shorts between distinct nets, crossings, unconnected), **FALSE shorts** (unreconciled
-  net fragments → run `merge_nets.py`), and **RULE/FAB/COSMETIC** (global via/clearance, silk). A clean
+  net fragments → run `merge_nets.py`), and **RULE/FAB/COSMETIC** (global via/clearance, silk).
+  **`unconnected` counts as BLOCKING** — before 2026-10-01 it didn't, so `RESULT: CLEAN ✓` could be
+  printed with open nets; don't trust an older "CLEAN" without reading the unconnected count. A clean
   placement = 0 courtyard overlaps; a routable placement = low unrouted on a FAST pass.
 - **Placement has THREE gates — all separate from routing, all must pass:** (1) **`outline-check.mjs`**
   — every part INSIDE the outline (not in a notch, cutout, reel, or screw hole; tscircuit has no keep-in,
@@ -487,7 +489,9 @@ Layer count is a *placement-difficulty* decision — the cheapest lever after pl
        but **won't fanout pads to it**: 0 plane vias, ~48 nets left unrouted. Its plane mode is a no-op here.
   4. So the recipe that actually converged: **keep GND/PWR in the route** (the QFN dogbones get placed),
      `add_plane.py` the inner zones, inject the SES, then **convert only the dense/short-prone corners**
-     (the LDO/USB power cluster) to plane-vias with a DRC-verified finisher, and give the **QFN a LOCAL
+     to plane-vias with a DRC-verified finisher (⚠️ on einhander the "short-prone LDO corner" turned out to
+     be the mixed-side DSN bug, not density — run `dsn_split_sides.py` first and re-check before
+     hand-patching any corner), and give the **QFN a LOCAL
      GND pour** (`add_local_zone.py U1 GND F.Cu`) so its ground pins tie into copper on their own layer and
      stitch down through the GND vias already there. Every GND/PWR pin ends on the plane; the only signal-
      layer power copper left is unavoidable short escapes, not cross-board snaking.
@@ -503,6 +507,10 @@ Layer count is a *placement-difficulty* decision — the cheapest lever after pl
      (the `padstack name expected at 'V3V3'` parse-breaker) AND relabels the inner layers `(type power)`
      so signals stay on F.Cu/B.Cu. (This keeps *signals* off the inner planes — it does NOT, on its own,
      move GND/PWR onto them; see the corrected step 3 above.)
+  2a. **`scripts/dsn_split_sides.py <kicad_pcb> <dsn>`** — un-mirror parts that share a footprint with a
+     part on the OTHER side (tscircuit dedupes DSN images by footprint name — see
+     [Mixed-side footprints](#mixed-side-footprints-the-dsn-mirrors-top-side-parts) below). Runs on
+     system `/usr/bin/python3` (needs KiCad's `pcbnew`). Idempotent; a no-op on single-sided boards.
   2b. **`scripts/add_npth_keepouts.py <kicad_pcb> <dsn>`** and **`scripts/add_cutout_keepouts.py`** — keepout
      every mechanical hole so no trace crosses a drilled hole (see the NPTH-keepout note below — this bit
      einhander AND flexisette).
@@ -526,8 +534,10 @@ Layer count is a *placement-difficulty* decision — the cheapest lever after pl
   - **USB-C CC/power corner is intrinsically hard — spread it.** CC resistors go on the **bottom, under the
     connector** (via straight behind each CC pin); spread the LDO + its caps into open band space; never
     cluster power at the connector (every wire crosses the 0.5 mm-pitch pad row → shorts).
-  - **Freerouting is NON-DETERMINISTIC — freeze one baseline, don't nudge-and-reroll.** Each re-route
-    reshuffles the whole board and the tail *moves* (10→15→6→9). Iterating placement + re-routing chases a
+  - **Freerouting's tail moves with ANY input change — freeze one baseline, don't nudge-and-reroll.** Each
+    re-route after a placement/DSN change reshuffles the whole board and the tail *moves* (10→15→6→9).
+    (The same DSN re-routed gave the same result 3/3 times on einhander, 2026-10-01 — it's the *input*
+    perturbation, not run-to-run noise, that moves the tail.) Iterating placement + re-routing chases a
     moving target; once a run comes out `RESULT: CLEAN ✓` (0 shorts/crossings) with a small unconnected
     tail, STOP re-routing and finish THAT board deterministically.
   - **Finishing a congested corner by adding copper shorts things.** A through-via's B.Cu ring bridges a
@@ -548,6 +558,41 @@ Layer count is a *placement-difficulty* decision — the cheapest lever after pl
     on the same layer through the gap beneath it — you pick the ONE crossing point deliberately. Cheaper and
     more reliable than hand-threading or re-placing the whole corner. (For a pure power net with few pads,
     the equivalent is a small local **copper pour/zone** for that net in the corner instead of a thin trace.)
+
+### Mixed-side footprints: the DSN mirrors top-side parts
+
+**The bug that kept einhander from ever routing clean unattended.** tscircuit's `specctra-dsn` export
+dedupes `(image …)` by footprint NAME. The FIRST instance defines it — so if that one is
+`layer="bottom"`, the image gets **mirrored pin X and `[B]` (B.Cu) padstacks**, and every TOP-side part
+with the same footprint inherits them. The `.kicad_pcb` export is correct per part, so the two files
+disagree and nothing warns you. Freerouting routes the DSN's version: B.Cu traces to the *opposite* pads,
+no via. After SES injection that reads as **unconnected pads + cross-net shorts + dangling stubs** clustered
+on a few innocent-looking parts — which looks exactly like "a dense corner the router can't handle".
+- einhander: bottom-side decap C11 (0805) defined the image; top-side C_IN / C_OUT / C_LED (also 0805)
+  inherited it → the raw unattended run had **1 short (VBUS↔RUN) + 6 unconnected + 3 dangling**, all on
+  those three caps. The shipped board had hand-patched them by coordinate (`fix_ldo_planes.py`,
+  `patch_stragglers.py`), blaming the router.
+- **Fix: `scripts/dsn_split_sides.py <board.kicad_pcb> <dsn>`** (route4.sh step 2a). Compares every DSN pin
+  in ABSOLUTE board coordinates (place + rotated image pin) against pcbnew's absolute pad position + copper
+  side, and gives any part that disagrees a private image rebuilt from the KiCad pads (+ a side-swapped
+  padstack clone). Compare in absolute coords — a rotated QFN (einhander U1 at −90°) stores pad offsets in
+  a different local frame in the two files and falsely "mismatches" if you compare locally.
+- Result on einhander: **0 shorts, 0 dangling, 2 unconnected, zero hand steps** (from 1/6/3), ~30 s.
+- **Diagnostic signature:** every defect involves the same few 2-pin parts, and each net's track ends on
+  the part's *other* pad, on the other layer. If you see that, suspect the DSN, not the router.
+
+### Freerouting tail dead-ends (tried on einhander 2026-10-01 — don't repeat)
+
+- **A net can silently vanish from the SES.** After the side fix, Freerouting 2.2.4 omitted QSPI_SCLK
+  from the session entirely (no wires at either pad) while reporting the run complete — deterministic,
+  3/3 runs. Only `drc_check` (unconnected) catches it; the router log won't.
+- **Incremental tail pass with frozen wiring hangs 2.2.4.** Writing the previous SES back into the DSN
+  as `(wiring … (type fix|protect|route))` so a second pass only routes the open nets: Freerouting stalls
+  after 0–2 passes even with only 10 frozen wires (vias alone are fine). Not a usable tail strategy.
+- **Freerouting v2.4.1 is worse here:** 1376 violations, ~90 s per optimizer pass, no SES in 200 s.
+  Stay on 2.2.4.
+- So the tail (≤ a few nets) is a hand-route in KiCad or a DRC-verified finisher (`finish_converge.py`),
+  not another router pass.
 
 ### Two traps that pass a shorts-only check but break the board (einhander + flexisette)
 
@@ -588,7 +633,8 @@ shorts from `fanout_planes.py`'s naive offset). Two rules:
   QFN (`add_local_zone.py <ref> GND F.Cu`) that the pins tie into on their own layer.
 - **Don't hardcode finisher coordinates.** `fix_ldo_planes.py` pinned a VBUS rail at a literal (x,y); a fresh
   re-route moved the rail and the trace dangled. Derive endpoints from the live board (nearest same-net
-  copper), or re-derive after every re-route.
+  copper), or re-derive after every re-route. (And that whole script existed only to paper over the
+  mixed-side DSN bug — a finisher that needs literal coordinates is usually hiding an upstream bug.)
 - **kipy over IPC dies between shell calls** — launch pcbnew and do all kipy work in ONE bash call
   (`scripts/apply_fix.sh <script> [args]` handles this: launches pcbnew, waits for `/tmp/kicad/api.sock`,
   runs the script, logs to a file that survives a hard kill, then kills pcbnew).
@@ -747,7 +793,15 @@ tools/genpinmap.mjs    imports/*.tsx -> lib/pinmap.json
 scripts/route.sh           THE pipeline: export->merge_nets->keepouts->fast Freerouting->IPC inject->DRC
 scripts/routecheck.sh      measured loop: unrouted + time per block
 scripts/outline-check.mjs  board-outline rule: parts outside the outline / in a cutout
-scripts/drc_check.py       triage DRC: PLACEMENT (courtyard) / ROUTING (shorts) / FALSE / RULE-COSMETIC
+scripts/drc_check.py       triage DRC: PLACEMENT (courtyard) / ROUTING (shorts, unconnected) / FALSE / RULE-COSMETIC
+scripts/route4.sh          4-layer pipeline: export->DSN prep (planes, side-split, keepouts)->freert224->IPC planes+SES->DRC
+scripts/dsn_split_sides.py un-mirror top/bottom parts sharing one DSN image (tscircuit export bug)
+scripts/finish_tail.py     IPC: close unconnected pads (plane via / straight track) — blind, open space only
+scripts/finish_iter.py     IPC: same, DRC-verified per placement (keeps only fixes that add no short)
+scripts/finish_converge.py IPC: monotonic finisher on a FROZEN board — keep a fix only if unconnected drops
+scripts/stitch_planes.py   IPC: stitch-via every GND/PWR island DRC reports to its inner plane
+scripts/add_dsn_planes.py  declare DSN (plane …) — kept as a record: 2.2.4 parses it but won't fanout
+scripts/diag_ipc.sh        debug the kipy/IPC socket (pcbnew launch + api.sock checks)
 scripts/merge_nets.py      reconcile fragmented cross-subcircuit nets in the kicad_pcb (by name)
 scripts/add_cutout_keepouts.py  auto-keepout every interior Edge.Cuts hole into the DSN
 scripts/freeroute.sh       route with Freerouting, FAST/capped (MP=/OIT=/MAXT=); DSN -> .ses

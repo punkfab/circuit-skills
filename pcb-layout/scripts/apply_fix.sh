@@ -1,6 +1,6 @@
 #!/bin/bash
 # Launch pcbnew, wait for the IPC socket, run the named python IPC script, kill pcbnew.
-# Usage: bash scripts/apply_fix.sh scripts/fix_ldo_planes.py
+# Usage: bash scripts/apply_fix.sh scripts/finish_converge.py
 # All output -> build/<script>.log (survives a hard kill).
 set +e
 PYSCRIPT="$1"

@@ -1,55 +1,83 @@
 #!/usr/bin/env bash
-# route4.sh — 4-layer route with Freerouting v2.2.4: signals on F.Cu/B.Cu,
-# GND/PWR carried on inner-plane ZONES (In1=GND, In2=V3V3) with the autorouter
-# placing the power fanout vias.  The recipe that finally worked:
+# route4.sh — 4-layer route, Freerouting v2.2.4.  SIGNALS route on F.Cu/B.Cu; GND & V3V3
+# are NOT routed at all — they're carried by inner-plane ZONES (In1=GND, In2=V3V3) and each
+# pad drops a fanout via to its plane.  Mechanical NPTH holes are keepouts so no trace crosses
+# a drilled hole.  This is the recipe that eliminates (a) GND/V3V3 traces on signal layers and
+# (b) traces routed across keyswitch/USB/screw holes.
 #
-#   * tscircuit exports a 4-layer DSN with ALL copper layers (type signal) AND a
-#     malformed (wiring) section (pre-placed power vias) -> dsn_4layer_planes.py
-#     strips the wiring + relabels the inner layers (type power) so Freerouting
-#     keeps SIGNALS off them and stitches GND/PWR pins to them with vias.
-#   * Freerouting v2.2.4 (needs JDK 25 -> freert224) honors (type power) inner
-#     layers as planes, writes a PARTIAL .ses (v2.1.0 only writes at 0 unrouted,
-#     and crashes with a maze NPE on this board).
-#   * KiCad side: add_plane In1=GND / In2=V3V3 zones, inject the .ses, refill, DRC.
+#   DSN prep : strip tscircuit's (wiring) + mark inner layers (type power)   [dsn_4layer_planes]
+#            : DROP GND & V3V3 from the routed netlist (plane-fed)           [dsn_drop_nets]
+#            : keepout interior Edge.Cuts cutouts + every NPTH hole          [add_cutout_keepouts + add_npth_keepouts]
+#   route    : Freerouting v2.2.4 (JDK25 -> freert224) routes signals + VBUS only
+#   KiCad    : pour In1=GND / In2=V3V3, inject signal SES, fanout GND/V3V3 pads to planes,
+#              stitch any island, set JLCPCB fab rules, DRC.
 #
-# Needs: bun/tsci, freert224 (JDK25 + freerouting-2.2.4.jar), kipy, KiCad api server.
+# Needs: bun/tsci, freert224, kipy, KiCad api server (socket /tmp/kicad/api.sock).
 set -eu
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.bun/bin:$PATH"
 TSCI=./node_modules/.bin/tsci
 SRC=index.circuit.tsx
 BOARD=index.circuit.kicad_pcb
+PRO=index.circuit.kicad_pro
 DSN=build/index.dsn
 SES=build/index.ses
 DISPLAY=${DISPLAY:-:0}
+DROP_NETS="${DROP_NETS:-GND V3V3}"
 mkdir -p build
 
-echo "[1/7] export 4-layer board + dsn"
+echo "[1/9] export 4-layer board + dsn"
 $TSCI export -f kicad_pcb "$SRC" -o "$BOARD" 2>&1 | grep -iE 'exported|error:' || true
 $TSCI export -f specctra-dsn "$SRC" -o "$DSN" 2>&1 | grep -iE 'exported|error:' || true
 
-echo "[2/7] placement gate (parts inside outline)"
+echo "[2/9] placement gate (parts inside outline)"
 node scripts/outline-check.mjs "$SRC" || { [ "${FORCE:-}" = 1 ] || { echo "fix placement"; exit 1; }; }
 
-echo "[3/7] DSN prep: strip wiring + inner layers -> (type power)"
+echo "[3/9] DSN prep: strip wiring + inner layers -> (type power)"
 python3 scripts/dsn_4layer_planes.py "$DSN" --no-planes --relabel-power
+# tscircuit dedupes DSN images by footprint name -> a top-side part sharing a footprint with a
+# bottom-side one inherits mirrored B.Cu pins. Rebuild those from the (correct) KiCad pads.
+/usr/bin/python3 scripts/dsn_split_sides.py "$BOARD" "$DSN"
 
-echo "[4/7] Freerouting v2.2.4 (signals F/B; power fanout vias to inner planes)"
+echo "[4/9] DSN: keep GND/V3V3 routed (Freerouting places the QFN dogbones); planes poured in KiCad"
+# NOTE: fully dropping GND/V3V3 (dsn_drop_nets) leaves fine-pitch QFN power pins stranded — they
+# need routed dogbone escapes only the autorouter places well, and Freerouting's (plane) mode won't
+# fan them out (leaves ~48 unrouted). So we let it route them and pour the planes in KiCad.
+# (The "dense LDO corner" shorts that fix_ldo_planes.py used to hand-patch were really the
+# mixed-side image bug that dsn_split_sides.py now fixes above. See the pcb-layout skill.)
+
+echo "[5/9] DSN: keepout interior cutouts + NPTH mechanical holes"
+python3 scripts/add_cutout_keepouts.py "$BOARD" "$DSN" --margin 0.3 || echo "  (no interior Edge.Cuts cutouts)"
+python3 scripts/add_npth_keepouts.py  "$BOARD" "$DSN" --margin 0.3 --min-hole 0.5
+
+echo "[6/9] Freerouting v2.2.4 (signals + VBUS; planes & holes avoided)"
 rm -f "$SES"
 "$HOME/.local/bin/freert224" -de "$DSN" -do "$SES" 2>&1 | grep -iE 'session completed|unrouted' | tail -1
 [ -s "$SES" ] || { echo "no SES written"; exit 1; }
 echo "      SES: $(grep -c '(wire' "$SES") wires, $(grep -c '(via' "$SES") vias"
 
-echo "[5/7] (re)launch pcbnew on the fresh board"
-pkill -9 java 2>/dev/null || true; rm -f /tmp/kicad/api.sock; sleep 1
-DISPLAY="$DISPLAY" setsid pcbnew "$BOARD" >/tmp/pcbnew.log 2>&1 < /dev/null &
-for i in $(seq 1 30); do sleep 3; python3 -c "import kipy; kipy.KiCad().get_board()" 2>/dev/null && break; done
+echo "[7/9] launch pcbnew, wait for IPC socket"
+pkill -9 java 2>/dev/null || true
+pkill -f 'pcbnew index' 2>/dev/null || true
+rm -f /tmp/kicad/api.sock
+DISPLAY="$DISPLAY" pcbnew "$BOARD" >build/pcbnew.log 2>&1 &
+PCBPID=$!
+for i in $(seq 1 40); do
+  if [ -S /tmp/kicad/api.sock ] && python3 -c "import kipy; kipy.KiCad().get_board()" >/dev/null 2>&1; then
+    echo "      IPC ready at ~${i}s"; break
+  fi
+  python3 -c "import time; time.sleep(1)"
+done
 
-echo "[6/7] inner-plane zones In1=GND, In2=V3V3"
-python3 scripts/add_plane.py GND In1.Cu --replace 2>&1 | tail -1
+echo "[8/9] pour inner planes (In1=GND, In2=V3V3) + inject routed signals/power"
+python3 scripts/add_plane.py GND  In1.Cu --replace              2>&1 | tail -1
 python3 scripts/add_plane.py V3V3 In2.Cu --replace --priority 1 2>&1 | tail -1
+python3 scripts/apply_ses_ipc.py "$SES" --save --clear          2>&1 | tail -2
 
-echo "[7/7] inject signals + power vias, refill, DRC"
-python3 scripts/apply_ses_ipc.py "$SES" --save --clear 2>&1 | tail -2
+echo "[9/9] fab rules + verify"
+python3 scripts/apply_fab_rules.py "$PRO" --fab jlcpcb          2>&1 | tail -1
+kill $PCBPID 2>/dev/null || true; pkill -f 'pcbnew index' 2>/dev/null || true
+python3 -c "import time; time.sleep(1)"
+python3 scripts/check_floating.py "$BOARD" || true
 python3 scripts/drc_check.py "$BOARD" 2>&1 | tail -22 || true
 echo "DONE — routed $BOARD"

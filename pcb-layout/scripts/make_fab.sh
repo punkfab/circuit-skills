@@ -19,30 +19,46 @@ NAME="${2:-$STEM}"
 FAB="$DIR/fab"; mkdir -p "$FAB"
 cd "$DIR"
 
+echo "[0/5] DFM gate (fab minimums KiCad DRC misses: hole spacing, via drill/annular)"
+set +e; python3 "$SELF/dfm_check.py" "$B" 2>&1 | sed 's/^/      /'; DFM_RC=${PIPESTATUS[0]}; set -e
+[ "$DFM_RC" -ne 0 ] && echo "      ⚠ DFM found ACTIONABLE issues above — bundling anyway, but fix before ordering." >&2 || true
+
 echo "[1/5] Gerbers (all layers + gerber-job)"
 kicad-cli pcb export gerbers -o "$FAB/" "$B" >/dev/null
 echo "[2/5] Excellon drill"
 kicad-cli pcb export drill -o "$FAB/" "$B" >/dev/null
-echo "[3/5] CPL / placement -> JLCPCB columns (Designator, Mid X/Y, Layer, Rotation)"
-kicad-cli pcb export pos --format csv --units mm --side both -o "$FAB/${NAME}-cpl-raw.csv" "$B" >/dev/null
-python3 - "$FAB/${NAME}-cpl-raw.csv" "$FAB/${NAME}-cpl.csv" <<'PYEOF'
-import csv, sys
-rows = list(csv.DictReader(open(sys.argv[1])))
-with open(sys.argv[2], "w", newline="") as f:
-    w = csv.writer(f)
-    w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])   # JLCPCB CPL header
-    for r in rows:
-        ref = (r.get("Ref") or "").strip()
-        if not ref:                                   # drop mounting-holes / no-designator rows
-            continue
-        side = (r.get("Side") or "top").strip().capitalize()   # Top / Bottom
-        w.writerow([ref, r.get("PosX", ""), r.get("PosY", ""), side, r.get("Rot", "")])
-PYEOF
-rm -f "$FAB/${NAME}-cpl-raw.csv"
 FAB_TGT="${3:-both}"    # jlcpcb | pcbway | both  (Gerbers + CPL are shared across fabs)
-echo "[4/5] BOM(s): $FAB_TGT"
+echo "[3/5] BOM(s): $FAB_TGT"
 case "$FAB_TGT" in jlcpcb|both) python3 "$SELF/gen_bom.py" "$B" --fab jlcpcb -o "$FAB/${NAME}-bom.csv" ;; esac
 case "$FAB_TGT" in pcbway|both) python3 "$SELF/gen_bom.py" "$B" --fab pcbway -o "$FAB/${NAME}-bom-pcbway.csv" ;; esac
+
+echo "[4/5] CPL / placement -> JLCPCB columns, filtered to assembled (BOM) parts only"
+kicad-cli pcb export pos --format csv --units mm --side both -o "$FAB/${NAME}-cpl-raw.csv" "$B" >/dev/null
+python3 - "$FAB/${NAME}-cpl-raw.csv" "$FAB/${NAME}-cpl.csv" "$FAB/${NAME}-bom.csv" "$FAB/${NAME}-bom-pcbway.csv" <<'PYEOF'
+import csv, sys
+raw, out = sys.argv[1], sys.argv[2]
+placed = set()                                        # designators that ARE in the assembly BOM
+for bf in sys.argv[3:]:
+    try:
+        for r in csv.DictReader(open(bf)):
+            for x in (r.get("Designator") or "").split(","):
+                if x.strip():
+                    placed.add(x.strip())
+    except FileNotFoundError:
+        pass
+n = 0
+with open(out, "w", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])   # JLCPCB CPL header
+    for r in csv.DictReader(open(raw)):
+        ref = (r.get("Ref") or "").strip()
+        if not ref or (placed and ref not in placed):  # drop holes + hand-solder (not in the BOM)
+            continue
+        side = (r.get("Side") or "top").strip().capitalize()   # Top / Bottom
+        w.writerow([ref, r.get("PosX", ""), r.get("PosY", ""), side, r.get("Rot", "")]); n += 1
+print(f"      CPL: {n} placed parts (matched to BOM designators)")
+PYEOF
+rm -f "$FAB/${NAME}-cpl-raw.csv"
 echo "[5/5] Zip Gerbers + drill -> ${NAME}-gerbers.zip"
 cd "$FAB"
 rm -f "${NAME}-gerbers.zip"
