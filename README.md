@@ -65,3 +65,10 @@ Claude Code discovers it automatically. `pcb-layout` needs `tscircuit` (via `bun
 IPC server enabled, `kipy` (`pip install kipy`), and a Freerouting CLI; `circuit-sim` needs `ngspice`;
 `pcb-3d-render` needs `tscircuit` and/or Blender 3.x+ (a GPU for fast Cycles) + `trimesh`;
 `pcb-enclosure-fit` needs `build123d` + Blender/OpenSCAD.
+
+## History
+
+[`docs/history/`](docs/history/README.md) records every project these skills were built on or used for —
+problems hit, root causes, dead ends, and which lessons are still missing from the skills
+([problems](docs/history/problems.md) · [open items](docs/history/open-items.md) ·
+[skill evolution](docs/history/skill-evolution.md)).
