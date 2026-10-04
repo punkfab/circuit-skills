@@ -222,13 +222,22 @@ let watchEpoch = 0;
 let stableRevision: string | undefined;
 function showProgress(updateMetrics = false) {
   const m = current?.board?.metrics, r = current?.routing;
-  $("progress").textContent = r ? `${r.backend}: ${r.state}${r.message ? " · " + r.message : ""}` : "live";
+  const progress = $("progress");
+  progress.textContent = r ? `Live · ${r.backend}: ${r.state}${r.message ? " · " + r.message : ""}` : "Live · watching saved board";
+  progress.title = `Last checked ${new Date().toLocaleTimeString()} · ${projectPath}`;
   if (updateMetrics && tab === "board" && m) setStatus(`${current!.board!.footprints} parts · ${m.track_mm_total} mm track · ${m.vias} vias`);
 }
 function startWatching() {
   clearTimeout(watchTimer);
   watching = true;
   const epoch = ++watchEpoch;
+  if (!current?.revision) {
+    watching = false;
+    $("progress").textContent = "Live updates unavailable";
+    message("Reload circuit-skills once", "This viewer is connected to an older plugin server. Reload the circuit-skills plugin and reopen this panel once to enable automatic updates.");
+    return;
+  }
+  $("progress").textContent = "Connecting live updates…";
   stableRevision = current?.revision;
   const tick = async () => {
     if (!watching || epoch !== watchEpoch) return;
