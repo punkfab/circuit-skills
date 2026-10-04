@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Circuit viewer</title>
+<style>
+  :root {
+    --bg: #101418;
+    --panel: #161b21;
+    --ink: var(--color-text-primary, #e8ecef);
+    --dim: var(--color-text-secondary, #8d98a5);
+    --rule: var(--color-border-primary, #2a323b);
+    --accent: #39d98a;
+    --bad: #ff5d5d;
+    --warn: #ffb547;
+    --font: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--ink); overflow: hidden; font-size: 13px; }
+  .bar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--panel); border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+  .bar .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30ch; }
+  .tabs { display: flex; gap: 2px; }
+  .tabs button, .bar button.act { font: inherit; font-size: 12px; color: var(--dim); background: transparent; border: 1px solid transparent; padding: 4px 9px; cursor: pointer; border-radius: 4px; }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--rule); background: var(--bg); }
+  .tabs button:disabled { opacity: 0.35; cursor: default; }
+  .bar button.act { border-color: var(--rule); color: var(--ink); }
+  .bar button:hover:not(:disabled) { color: var(--ink); }
+  .status { flex: 1; min-width: 0; color: var(--dim); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status.bad { color: var(--bad); } .status.good { color: var(--accent); }
+  .stage { position: relative; height: var(--stage-h, 560px); }
+  .view { position: absolute; inset: 0; display: flex; }
+  .side { flex: none; width: 190px; overflow: auto; border-right: 1px solid var(--rule); padding: 8px 10px; background: var(--panel); }
+  .side h4 { margin: 10px 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); font-weight: 600; }
+  .side h4:first-child { margin-top: 0; }
+  .side label { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; font-size: 12px; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  .side .count { margin-left: auto; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .side .hint { color: var(--dim); font-size: 11px; line-height: 1.4; margin-top: 10px; }
+  .canvas { flex: 1; position: relative; min-width: 0; }
+  .canvas svg.pz { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  .canvas svg.pz.dragging { cursor: grabbing; }
+  .schematic-bg { background: #f5f1ed; }
+  .msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--dim); line-height: 1.5; }
+  .msg b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+  .scroll { flex: 1; overflow: auto; padding: 12px 14px; }
+  pre { font-family: var(--mono); font-size: 12px; line-height: 1.45; margin: 0; white-space: pre-wrap; }
+  input[type=text] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 6px 8px; }
+  .netbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .netbar input { flex: 1; }
+  mark { background: #3a3a10; color: inherit; }
+  .verdict { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .verdict.ok { color: var(--accent); } .verdict.bad { color: var(--bad); }
+  .gate { border: 1px solid var(--rule); border-radius: 6px; margin: 10px 0; }
+  .gate summary { cursor: pointer; padding: 7px 10px; display: flex; gap: 8px; align-items: center; }
+  .gate pre { padding: 8px 10px; border-top: 1px solid var(--rule); max-height: 320px; overflow: auto; }
+  .pill { font-size: 11px; padding: 1px 7px; border-radius: 9px; border: 1px solid currentColor; }
+  .pill.ok { color: var(--accent); } .pill.bad { color: var(--bad); }
+  table.metrics { border-collapse: collapse; margin-top: 8px; }
+  table.metrics td { padding: 3px 14px 3px 0; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  table.metrics td:first-child { color: var(--dim); }
+  .picker { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; }
+  .picker #pick { width: min(560px, 100%); }
+  .picker p { color: var(--dim); line-height: 1.5; }
+  .picker .row { display: flex; gap: 8px; } .picker .row input { flex: 1; }
+  .picker button, .scroll button { font: inherit; color: var(--bg); background: var(--accent); border: 0; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-weight: 600; }
+  .recent { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .recent a { color: var(--ink); cursor: pointer; font-family: var(--mono); font-size: 12px; text-decoration: none; }
+  .recent a:hover { text-decoration: underline; }
+  .three { flex: 1; position: relative; } .three canvas { display: block; }
+  @media (max-width: 560px) { .side { width: 140px; } .status { display: none; } }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span class="name" id="name">Circuit viewer</span>
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="board">Board</button>
+      <button role="tab" data-tab="schematic">Schematic</button>
+      <button role="tab" data-tab="netlist">Netlist</button>
+      <button role="tab" data-tab="3d">3D</button>
+      <button role="tab" data-tab="checks">Checks</button>
+    </div>
+    <span class="status" id="status" role="status"></span>
+    <button class="act" id="review" type="button" hidden>Review this board</button>
+    <button class="act" id="expand" type="button" hidden>Expand</button>
+  </div>
+  <div class="stage">
+    <div class="picker" id="picker" hidden>
+      <div id="pick">
+        <p><b style="color:var(--ink)">Open a PCB project.</b> Paste the path of a project folder, a <code>.kicad_pcb</code> board or a <code>.circuit.tsx</code> design, or ask the agent to open one.</p>
+        <div class="row"><input type="text" id="pick-path" placeholder="/path/to/project/pcb" spellcheck="false"><button type="button" id="pick-go">Open</button></div>
+        <div class="recent" id="recent"></div>
+      </div>
+    </div>
+    <div class="view" data-view="board" hidden>
+      <div class="side">
+        <h4>Layers</h4><div id="layers"></div>
+        <h4>DRC markers</h4><div id="drc"></div>
+        <div class="hint">Drag to pan, scroll or pinch to zoom, double-click to fit. Click a marker type to step through them.</div>
+      </div>
+      <div class="canvas" id="board-canvas"></div>
+    </div>
+    <div class="view" data-view="schematic" hidden><div class="canvas schematic-bg" id="sch-canvas"></div></div>
+    <div class="view" data-view="netlist" hidden>
+      <div class="scroll">
+        <div class="netbar"><input type="text" id="net-filter" placeholder="Filter: a net, a part (U1), a pin (U1.52)…" spellcheck="false"><span id="net-from" class="count" style="color:var(--dim)"></span></div>
+        <pre id="netlist"></pre>
+      </div>
+    </div>
+    <div class="view" data-view="3d" hidden><div class="three" id="three"></div></div>
+    <div class="view" data-view="checks" hidden><div class="scroll" id="checks"></div></div>
+    <div class="msg" id="msg" hidden><div><b id="msg-title"></b><span id="msg-text"></span></div></div>
+  </div>
+  <script>/*%%VIEWER_JS%%*/</script>
+</body>
+</html>

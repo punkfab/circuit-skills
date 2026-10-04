@@ -1,0 +1,29 @@
+{
+  "name": "circuit-skills-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "circuit-skills as a Codex plugin: a viewer for code-driven PCB projects (schematic, netlist, routed board, 3D) plus the board checks, over MCP Apps.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node --test \"test/*.test.mjs\"",
+    "e2e": "node build.mjs && node e2e/viewer-host.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@openai/mcp-extensions": "^0.1.0",
+    "three": "^0.180.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/three": "^0.180.0",
+    "esbuild": "^0.25.0",
+    "playwright-core": "^1.63.0",
+    "typescript": "^5.9.3"
+  }
+}

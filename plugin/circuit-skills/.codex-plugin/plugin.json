@@ -1,0 +1,44 @@
+{
+  "name": "circuit-skills",
+  "version": "0.1.0",
+  "description": "Code-driven PCB design in Codex: the circuit-skills (pcb-layout, circuit-sim, pcb-enclosure-fit, pcb-3d-render) plus a viewer for the schematic, netlist, routed board with DRC markers, and 3D, and the board checks the pipeline gates on.",
+  "author": {
+    "name": "punkfab",
+    "url": "https://punkfab.com"
+  },
+  "homepage": "https://github.com/punkfab/circuit-skills",
+  "repository": "https://github.com/punkfab/circuit-skills",
+  "keywords": [
+    "pcb",
+    "kicad",
+    "tscircuit",
+    "freerouting",
+    "electronics",
+    "drc",
+    "spice"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Circuit viewer",
+    "shortDescription": "Design, route and check PCBs",
+    "longDescription": "circuit-skills teaches the agent a code-driven PCB pipeline: tscircuit modules and placement, Freerouting with KiCad as the finisher, fab rules, and the gates that catch what exports and routers get wrong. The viewer shows a project the way the pipeline builds it: the schematic and netlist from the design, the routed KiCad board layer by layer with every DRC marker, an orbitable 3D view, and the drc / dfm / floating-pad checks with routing metrics. Open it from the sidebar, beside a conversation, or on any .kicad_pcb or .circuit.tsx file.",
+    "developerName": "punkfab",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "websiteURL": "https://punkfab.com",
+    "composerIcon": "./assets/composer-icon.svg",
+    "composerIconDark": "./assets/composer-icon-dark.svg",
+    "logo": "./assets/logo.svg",
+    "defaultPrompt": [
+      "Open this project's board in the circuit viewer and check it.",
+      "Route the board with the pcb-layout pipeline, then show me the DRC markers that are left.",
+      "Compare pcb/ and pcb-rerun/: run check_board on both and tell me what differs."
+    ],
+    "brandColor": "#1B6B47",
+    "brandColorDark": "#39D98A"
+  }
+}

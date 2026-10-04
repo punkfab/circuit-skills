@@ -1,0 +1,20 @@
+{
+  "name": "circuit-skills",
+  "interface": {
+    "displayName": "circuit-skills"
+  },
+  "plugins": [
+    {
+      "name": "circuit-skills",
+      "source": {
+        "source": "local",
+        "path": "./plugin/circuit-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

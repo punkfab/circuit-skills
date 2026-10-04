@@ -66,6 +66,13 @@ IPC server enabled, `kipy` (`pip install kipy`), and a Freerouting CLI; `circuit
 `pcb-3d-render` needs `tscircuit` and/or Blender 3.x+ (a GPU for fast Cycles) + `trimesh`;
 `pcb-enclosure-fit` needs `build123d` + Blender/OpenSCAD.
 
+## Codex plugin
+
+[`plugin/circuit-skills/`](plugin/circuit-skills/README.md) packages these skills for Codex with a
+**circuit viewer** (schematic, netlist, routed board with DRC markers, 3D) and the board checks as
+tools. Install from a clone: `codex plugin marketplace add /path/to/circuit-skills` then
+`codex plugin add circuit-skills@circuit-skills`. Source and tests: [`mcp/`](mcp/).
+
 ## History
 
 [`docs/history/`](docs/history/README.md) records every project these skills were built on or used for —
