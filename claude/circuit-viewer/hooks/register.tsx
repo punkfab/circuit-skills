@@ -41,6 +41,9 @@ async function cli<T>($: $, command: string, path: string, timeoutMs = 120_000):
   return answer.data as T
 }
 
+/** A tool's own arguments arrive on the tool.call event itself, beside `tool` and `tool_use_id`. */
+const arg = (e: object, name: string): unknown => (e as Record<string, unknown>)[name]
+
 const blocking = (s: Snapshot | null): Marker[] => (s?.drc?.markers ?? []).filter(m => SERIOUS.has(m.type))
 
 function summary(s: Snapshot): string {
@@ -193,7 +196,7 @@ export const register: Register = on => {
   })
 
   on('tool.call', { tool: 'mcp__circuit-viewer__open_board' }, async ($, e) => {
-    const path = String((e.input as { path?: unknown }).path ?? '')
+    const path = String(arg(e, 'path') ?? '')
     try {
       const snap = await load($, path, { withChecks: true })
       lastStamp = await stamp($, snap)
@@ -205,7 +208,7 @@ export const register: Register = on => {
   })
 
   on('tool.call', { tool: 'mcp__circuit-viewer__check_board' }, async ($, e) => {
-    const given = (e.input as { path?: unknown }).path
+    const given = arg(e, 'path')
     const open_ = await read($, targetA)
     const path = typeof given === 'string' && given ? given : open_
     if (!path) return { deny: 'No board open in the circuit viewer; give a path.' }
@@ -223,7 +226,7 @@ export const register: Register = on => {
   })
 
   on('tool.call', { tool: 'mcp__circuit-viewer__get_netlist' }, async ($, e) => {
-    const given = (e.input as { path?: unknown }).path
+    const given = arg(e, 'path')
     const path = typeof given === 'string' && given ? given : await read($, targetA)
     if (!path) return { deny: 'No project open in the circuit viewer; give a path.' }
     try {
