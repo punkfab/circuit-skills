@@ -1,4 +1,5 @@
 import { readdir, stat } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 // A circuit-skills project is a tscircuit source (*.circuit.tsx, the design) and
@@ -54,7 +55,8 @@ function named(root: string, board?: string): string {
  * or a folder (the project folder, or one that has a pcb/ folder in it).
  */
 export async function resolveProject(input: string): Promise<Project> {
-  const target = path.resolve(input);
+  // "~/x" as a person types it in /board or a tool call; Node does not expand it.
+  const target = path.resolve(input.replace(/^~(?=$|\/)/, os.homedir()));
   if (await isFile(target)) {
     const root = path.dirname(target);
     if (target.endsWith(".kicad_pcb")) {

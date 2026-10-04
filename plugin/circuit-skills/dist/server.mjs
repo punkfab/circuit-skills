@@ -36998,6 +36998,7 @@ ${g.output}`)].join("\n");
 
 // src/project.ts
 import { readdir as readdir2, stat as stat3 } from "node:fs/promises";
+import os2 from "node:os";
 import path4 from "node:path";
 var isFile = async (p) => (await stat3(p).catch(() => null))?.isFile() ?? false;
 var isDir = async (p) => (await stat3(p).catch(() => null))?.isDirectory() ?? false;
@@ -37022,7 +37023,7 @@ function named(root, board) {
   return board && path4.basename(board) !== "index.circuit.kicad_pcb" ? `${base} \xB7 ${path4.basename(board)}` : base;
 }
 async function resolveProject(input2) {
-  const target = path4.resolve(input2);
+  const target = path4.resolve(input2.replace(/^~(?=$|\/)/, os2.homedir()));
   if (await isFile(target)) {
     const root = path4.dirname(target);
     if (target.endsWith(".kicad_pcb")) {

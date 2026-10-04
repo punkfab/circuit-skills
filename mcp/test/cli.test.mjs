@@ -55,6 +55,13 @@ test("check: the gates run from the embedded scripts", { skip, timeout: 300_000 
   assert.match(r.data.text, /unconnected=2/);
 });
 
+test("a path starting with ~ is the home folder", { skip }, () => {
+  const rel = path.relative(os.homedir(), path.join(FIXTURE, "pcb-rerun"));
+  const r = cli("status", `~/${rel}`);
+  assert.ok(r.ok, r.error);
+  assert.equal(r.data.project.name, "einhander/pcb-rerun");
+});
+
 test("errors come back as JSON", () => {
   const r = cli("snapshot", "/nonexistent");
   assert.equal(r.ok, false);
