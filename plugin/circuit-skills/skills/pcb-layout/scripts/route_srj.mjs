@@ -18,7 +18,8 @@
 //   rules      the .kicad_pro's Default netclass (track, clearance, via) when present, else JLCPCB
 //              minimums; the flags override. Never below 0.127 clearance / 0.3 drill / 0.6 via.
 //   --board    write live status to <board>.routing.json for the viewer (backend "srj").
-//   --srj-only write the router input and stop (for inspecting or filing router bug reports).
+//   --srj-only write the router input and stop. Every routed run also keeps <out>.srj.json (input)
+//              and <out>.routes.json (output) for debugging and router bug reports.
 //
 // Needs Node 18+ and the router package: npm install --prefix <this folder>/srj (or set
 // CAPACITY_AUTOROUTER to a folder containing @tscircuit/capacity-autorouter). Zone refill uses
@@ -256,6 +257,8 @@ async function main() {
   try { mod = await import(pathToFileURL(createRequire(path.join(base, "package.json")).resolve("@tscircuit/capacity-autorouter")).href); }
   catch { usage(`the router is not installed: npm install --prefix ${path.join(HERE, "srj")}  (or set CAPACITY_AUTOROUTER)`); }
 
+  // The router's exact input beside the candidate (its output follows as .routes.json).
+  writeFileSync(output + ".srj.json", JSON.stringify(srj));
   publish("running", `routing ${tag}; KiCad verification pending`);
   const solver = new mod.AutoroutingPipelineSolver(srj);
   let lastTick = Date.now();
