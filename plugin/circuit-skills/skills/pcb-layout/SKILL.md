@@ -899,6 +899,64 @@ Recent tscircuit also **disables `sequential_trace` by default** (it needs
 `platformConfig.allowLegacyAutorouters`); the default router plus `<autoroutingphase />` / `<fanout />`
 is its replacement.
 
+### The capacity autorouter on any KiCad board (fourth backend)
+
+[tscircuit-autorouter](https://github.com/tscircuit/tscircuit-autorouter) (`@tscircuit/capacity-autorouter`,
+the router inside tscircuit) is a library that routes a *SimpleRouteJson*. `scripts/route_srj.mjs`
+builds one from the **.kicad_pcb itself**, so it routes any KiCad board, not only tscircuit designs,
+and with **the fab's via sizes and clearances** (what the `tsci export` path cannot pass):
+
+```bash
+npm install --prefix scripts/srj                      # once: the router (pinned, ~220 MB, gitignored)
+node scripts/route_srj.mjs board.kicad_pcb -o build/srj.kicad_pcb [--layers auto|all|outer] [--time 300]
+ROUTER=srj SRJ_LAYERS=outer bash scripts/route4.sh    # in the pipeline (planes poured after)
+```
+
+- **Input:** every pad as an obstacle at its real copper extent and net (custom pads use their
+  primitives, so a USB-C pad with a 0.2 mm anchor is its full 0.6 x 1.3 mm), NPTH holes, board bounds,
+  and rules from the `.kicad_pro` Default netclass floored at JLCPCB (clearance 0.127, via 0.6/0.3).
+  `--layers auto` routes signals on the outer layers when the board already has inner-layer zones.
+- **Output:** routes from scratch (existing tracks dropped), duplicate stacked vias merged, zones
+  refilled with pcbnew, live status in `<board>.routing.json`; the router's own input and output are
+  kept (`--srj-only`, `<candidate>.routes.json`) for debugging and upstream bug reports.
+- Runs **locally** (Pipeline 9). The package's *Networked* solver sends work to a remote cache; it is
+  not used.
+- Known router behaviour (0.0.958): it may neck a trace down to 0.1 mm and place a via against another
+  net's track; the gates catch both. Planes poured *before* routing must be refilled after it, or every
+  new via reads as a short against stale plane copper (kicad-cli has no refill: route_srj does it).
+
+## Find the best route: `scripts/route_eval.py`
+
+Routers disagree board to board, so don't pick one: run them all and keep score.
+
+```bash
+python3 scripts/route_eval.py <project dir | board.kicad_pcb> [--backends LIST] [--time 300] [--apply]
+```
+
+Backends: `freerouting`, `fastroute`, `tscircuit[:preset]`, `srj[:all|outer]`, and `current` (the board as
+it is, as a baseline); default is every one installed. A **project** runs `route4.sh` per backend in its
+own copy (node_modules linked, this skill's scripts), so planes, fab rules and gates are identical and
+the project is untouched; a **bare board** gets `srj` and `current`. Every candidate is scored the same
+way (KiCad DRC under the project's or JLCPCB rules, dfm_check, check_floating, critical routing when a
+policy exists, metrics) and ranked: shorts+crossings, open nets, DFM, floating pads, size violations,
+clearance, vias, track length. Results: `route-evals/<run>/` (candidates, logs, `results.json`,
+`summary.md`) and one line per candidate appended to **`route-evals/history.jsonl`**, with the
+skill's git revision and router versions, so approaches can be compared across runs and upgrades.
+`--apply` copies the winner over the board (the previous one is kept in the run folder).
+
+einhander, 2026-10-04 (same placement, full route4 pipeline each, JLC rules):
+
+| # | backend | shorts | open | DFM | size | clearance | vias | track mm |
+|---|---|---|---|---|---|---|---|---|
+| 1 | srj:outer | 0 | 0 | 2 | 0 | 32 | 88 | 1391 |
+| 2 | tscircuit:auto_local | 0 | 0 | 88 | 339 | 276 | 113 | 1347 |
+| 3 | freerouting | 0 | 2 | 0 | 0 | 0 | 32 | 1421 |
+| 4 | srj:all | 3 | 0 | 1 | 0 | 15 | 70 | 1355 |
+
+No candidate was clean: the winner is a better *starting point* for the finishing tail, not a
+finished board. The ranking puts open nets ahead of fab issues on purpose (an open net is a dead
+board); read the whole table, not just row 1.
+
 ## Critical routing coverage before release
 
 Passing geometry gates is not a signal-integrity signoff. For USB, Ethernet, crystal,

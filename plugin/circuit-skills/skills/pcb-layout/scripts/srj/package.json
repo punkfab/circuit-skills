@@ -1,0 +1,9 @@
+{
+  "name": "circuit-skills-srj-router",
+  "private": true,
+  "description": "The router route_srj.mjs drives: tscircuit's capacity autorouter (github.com/tscircuit/tscircuit-autorouter), run locally on any KiCad board. Install once: npm install --prefix pcb-layout/scripts/srj",
+  "type": "module",
+  "dependencies": {
+    "@tscircuit/capacity-autorouter": "0.0.958"
+  }
+}

@@ -14,7 +14,7 @@
 #
 # Needs: bun/tsci, freert224, kipy, KiCad api server (socket /tmp/kicad/api.sock).
 #
-# Router: ROUTER=freerouting (default) | fastroute (FASTROUTE_BIN=) | tscircuit. tscircuit routes the
+# Router: ROUTER=freerouting (default) | fastroute (FASTROUTE_BIN=) | tscircuit | srj (route_srj.mjs, SRJ_LAYERS=outer|all). tscircuit routes the
 # design itself (route_tscircuit.mjs; TSCIRCUIT_AUTOROUTER=auto_local, TSCIRCUIT_EFFORT=2x): no DSN/SES,
 # the routed export replaces the board, then planes, fab rules and the gates as usual.
 set -eu
@@ -37,7 +37,14 @@ $TSCI export -f specctra-dsn "$SRC" -o "$DSN" 2>&1 | grep -iE 'exported|error:' 
 echo "[2/9] placement gate (parts inside outline)"
 node scripts/outline-check.mjs "$SRC" || { [ "${FORCE:-}" = 1 ] || { echo "fix placement"; exit 1; }; }
 
-if [ "${ROUTER:-freerouting}" = tscircuit ]; then
+if [ "${ROUTER:-freerouting}" = srj ]; then
+  # tscircuit's capacity autorouter on the exported board itself (route_srj.mjs). Signals on the
+  # outer layers by default, since the inner planes are poured below; SRJ_LAYERS=all to use all.
+  echo "[3-6/9] capacity autorouter on the KiCad board (layers ${SRJ_LAYERS:-outer})"
+  CAND="build/srj-${SRJ_LAYERS:-outer}-$(date +%Y%m%d-%H%M%S).kicad_pcb"
+  node scripts/route_srj.mjs "$BOARD" -o "$CAND" --layers "${SRJ_LAYERS:-outer}" --board "$BOARD" --time "${MAXT:-300}" --no-refill || exit 1
+  cp "$CAND" "$BOARD"
+elif [ "${ROUTER:-freerouting}" = tscircuit ]; then
   # tscircuit routes the design itself while it is evaluated: no DSN, no SES. The candidate
   # replaces the plain export; planes, fab rules and the gates below apply as for any backend.
   echo "[3-6/9] tscircuit autorouter (${TSCIRCUIT_AUTOROUTER:-auto_local}${TSCIRCUIT_EFFORT:+, effort $TSCIRCUIT_EFFORT})"
@@ -86,7 +93,7 @@ done
 echo "[8/9] pour inner planes (In1=GND, In2=V3V3) + inject routed signals/power"
 python3 scripts/add_plane.py GND  In1.Cu --replace              2>&1 | tail -1
 python3 scripts/add_plane.py V3V3 In2.Cu --replace --priority 1 2>&1 | tail -1
-[ "${ROUTER:-freerouting}" = tscircuit ] || python3 scripts/apply_ses_ipc.py "$SES" --save --clear 2>&1 | tail -2
+case "${ROUTER:-freerouting}" in tscircuit|srj) ;; *) python3 scripts/apply_ses_ipc.py "$SES" --save --clear 2>&1 | tail -2 ;; esac
 
 echo "[9/9] fab rules + verify"
 python3 scripts/apply_fab_rules.py "$PRO" --fab jlcpcb          2>&1 | tail -1
