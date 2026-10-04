@@ -73,6 +73,13 @@ IPC server enabled, `kipy` (`pip install kipy`), and a Freerouting CLI; `circuit
 tools. Install from a clone: `codex plugin marketplace add /path/to/circuit-skills` then
 `codex plugin add circuit-skills@circuit-skills`. Source and tests: [`mcp/`](mcp/).
 
+## Claude Code mod
+
+[`claude/circuit-viewer/`](claude/circuit-viewer/README.md) is the same viewer inside Claude Code: a live
+pane with the routed board and its DRC markers (a colour picture in any terminal, SVG on desktop),
+`/board <path>`, and `open_board` / `check_board` / `get_netlist` tools. Load it with
+`claude --plugin-dir /path/to/circuit-skills/claude/circuit-viewer`.
+
 ## History
 
 [`docs/history/`](docs/history/README.md) records every project these skills were built on or used for —

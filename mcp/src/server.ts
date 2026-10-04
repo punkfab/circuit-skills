@@ -1,11 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
 import path from "node:path";
-import { projectStatus } from "./status.js";
 import { z } from "zod";
-import { checkBoard, type CheckReport } from "./checks.js";
+import { checkBoard } from "./checks.js";
+import { checkText, describeProject, projectText } from "./describe.js";
+import { projectStatus } from "./status.js";
 import { resolveProject, type Project } from "./project.js";
-import { boardDrc, boardGlb, boardInfo, boardLayerNames, layerSvg, netlistText, schematicSvg } from "./views.js";
+import { boardDrc, boardGlb, layerSvg, netlistText, schematicSvg } from "./views.js";
 
 // circuit-skills as an MCP App, with OpenAI's plugin-extension entrypoints.
 //
@@ -46,47 +47,6 @@ export interface ServerOptions {
   widgetHtml: string;
   /** Monochrome SVG (currentColor) shown in the sidebar and tabs. */
   iconSvg: string;
-}
-
-/** What the widget and the model are told about an opened project. */
-async function describeProject(project: Project) {
-  const info = project.board ? await boardInfo(project.board) : null;
-  return {
-    ...(await projectStatus(project)),
-    project,
-    layers: project.board ? await boardLayerNames(project.board) : [],
-    board: info
-      ? {
-          copperLayers: info.copperLayers,
-          bbox: info.bbox,
-          footprints: info.footprints,
-          nets: info.nets.length,
-          zoneNets: info.zoneNets,
-          metrics: info.metrics,
-        }
-      : null,
-  };
-}
-
-function projectText(d: Awaited<ReturnType<typeof describeProject>>): string {
-  const p = d.project;
-  const lines = [`Opened ${p.name} in the circuit viewer (${p.root}).`];
-  lines.push(p.source ? `Design: ${path.basename(p.source)} (tscircuit)` : "Design: none (no .circuit.tsx; schematic unavailable)");
-  if (d.board) {
-    const b = d.board;
-    const size = b.bbox ? `${b.bbox.w.toFixed(1)} x ${b.bbox.h.toFixed(1)} mm, ` : "";
-    lines.push(
-      `Board: ${path.basename(p.board!)}: ${size}${b.copperLayers.length} copper layers, ${b.footprints} footprints, ${b.nets} nets; ` +
-        `${b.metrics.track_mm_total} mm of track, ${b.metrics.vias} vias`,
-    );
-  } else lines.push("Board: none exported yet (run the pcb-layout export/route step).");
-  lines.push("Run check_board for the DRC / DFM / floating-pad gates.");
-  return lines.join("\n");
-}
-
-function checkText(r: CheckReport, verbose: boolean): string {
-  if (!verbose) return r.summary;
-  return [r.summary, ...r.gates.map((g) => `\n── ${g.name} (${g.ok ? "pass" : `exit ${g.exitCode}`}) ──\n${g.output}`)].join("\n");
 }
 
 function pathFromMeta(extra: unknown): string | undefined {

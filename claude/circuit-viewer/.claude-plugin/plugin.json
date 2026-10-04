@@ -1,0 +1,8 @@
+{
+  "name": "circuit-viewer",
+  "version": "0.1.0",
+  "description": "Circuit viewer for code-driven PCB projects: a live pane with the routed KiCad board and its DRC markers, the pcb-layout gates, and open_board / check_board / get_netlist tools.",
+  "author": { "name": "punkfab", "url": "https://punkfab.com" },
+  "homepage": "https://github.com/punkfab/circuit-skills",
+  "types": "./types/index.d.ts"
+}
