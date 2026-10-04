@@ -80,7 +80,7 @@ def metrics(board):
     return {'track_mm': round(total, 1), 'segments': segs, 'vias': vias, 'plane_net_track_mm': round(zone, 1)}
 
 
-def score(board, workdir):
+def score(board, workdir, label=None):
     board = Path(board)
     pro = board.with_suffix('.kicad_pro')
     if not pro.exists():
@@ -89,7 +89,7 @@ def score(board, workdir):
         if src:
             shutil.copy(src, pro)
         subprocess.run([sys.executable, str(HERE / 'apply_fab_rules.py'), str(pro), '--fab', 'jlcpcb'], capture_output=True)
-    drc_json = Path(workdir) / (board.stem + '.drc.json')
+    drc_json = Path(workdir) / f'{label or board.stem}.drc.json'  # one per candidate: project candidates share a file name
     subprocess.run(['kicad-cli', 'pcb', 'drc', '--format', 'json', '--severity-error', '--units', 'mm', '-o', str(drc_json), str(board)], capture_output=True)
     drc = json.loads(drc_json.read_text()) if drc_json.exists() else {'violations': [], 'unconnected_items': []}
     counts = Counter(v['type'] for v in drc.get('violations', []))
@@ -177,15 +177,121 @@ def versions():
     return v
 
 
+
+# ---- diagnosis: hand-finish or re-place? --------------------------------------------------------
+DEFECT_TYPES = SHORT | CLEAR | SIZE
+
+
+def defect_points(drc_json):
+    """Positions of a candidate's blocking and fab defects (first item of each)."""
+    try:
+        d = json.loads(Path(drc_json).read_text())
+    except (OSError, ValueError):
+        return []
+    pts = [(v['type'], v['items'][0]['pos']['x'], v['items'][0]['pos']['y']) for v in d.get('violations', []) if v['type'] in DEFECT_TYPES and v.get('items')]
+    pts += [('unconnected', u['items'][0]['pos']['x'], u['items'][0]['pos']['y']) for u in d.get('unconnected_items', []) if u.get('items')]
+    return pts
+
+
+def diagnose(run_dir, results, board, hand_max=10, region_mm=3.0):
+    """Placement score + where each candidate fails -> a recommendation.
+
+    Two signals decide it. (1) Agreement: regions where most routers fail point at the placement;
+    routers failing in different places is router luck. (2) Congestion: defects in the placement's
+    hot cells (top decile of RUDY) point at the placement too. A best candidate with few defects
+    outside both is worth finishing by hand."""
+    sys.path.insert(0, str(HERE))
+    import placement_score
+    ps = placement_score.score(str(board))
+    g, cell = ps['grid'], ps['cell_mm']
+    hot = ps['congestion']['hot_threshold']
+    pads = placement_score.read_board(Path(board).read_text())['pads']
+
+    def util(x, y):
+        i, j = int((x - g['x0']) / cell), int((y - g['y0']) / cell)
+        return g['util'][j][i] if 0 <= i < g['nx'] and 0 <= j < g['ny'] else 0.0
+
+    routed = [r for r in results if r['ok'] and r['backend'] != 'current']
+    per = {}
+    regions = {}
+    for r in routed:
+        label = r['backend'].replace(':', '-')
+        pts = defect_points(Path(run_dir) / f'{label}.drc.json')
+        per[r['backend']] = pts
+        for _, x, y in pts:
+            regions.setdefault((int(x // region_mm), int(y // region_mm)), set()).add(r['backend'])
+    need = max(2, -(-len(routed) // 2))  # at least half the routers, and at least two
+    agree = []
+    for (i, j), who in regions.items():
+        if len(who) >= need:
+            x0, y0 = i * region_mm, j * region_mm
+            parts = sorted({p['ref'] for p in pads if x0 - 1 <= p['x'] <= x0 + region_mm + 1 and y0 - 1 <= p['y'] <= y0 + region_mm + 1})
+            agree.append({'at': [x0, y0, x0 + region_mm, y0 + region_mm], 'routers': len(who), 'hot': util(x0 + region_mm / 2, y0 + region_mm / 2) >= hot or any(util(x0 + a, y0 + b) >= hot for a in (0.5, 1.5, 2.5) for b in (0.5, 1.5, 2.5)), 'parts': parts})
+    agree.sort(key=lambda a: (-a['routers'], -a['hot']))
+
+    best = next((r for r in sorted(routed, key=lambda r: rank_key(r['score']))), None)
+    out = {'placement': {k: ps[k] for k in ('congestion', 'ratsnest', 'escape', 'hotspots', 'routing_layers', 'plane_nets')},
+           'agreement_regions': agree, 'hand_max': hand_max}
+    if not best:
+        out['recommendation'] = 're-place: no router produced a candidate'
+        return out
+    b = best['score']
+    pts = per.get(best['backend'], [])
+    in_hot = sum(1 for _, x, y in pts if util(x, y) >= hot)
+    blocking = b['shorts'] + b['unconnected'] + b['dfm_actionable'] + b['floating'] + b['size_violations']
+    remaining = blocking + b['clearance']
+    hot_share = in_hot / len(pts) if pts else 0.0
+    hot_agree = [a for a in agree if a['hot']]
+    out.update(best=best['backend'], remaining=remaining, defects_in_hot_cells=round(hot_share, 2))
+    if remaining == 0:
+        rec = f"order-ready candidate: {best['backend']} passes every gate; review it and run check_board before ordering"
+    elif remaining <= hand_max and not (hot_agree and hot_share >= 0.5):
+        rec = f"hand-finish {best['backend']}: {remaining} item(s), {round(100 * hot_share)}% in congested cells, no placement hotspot that most routers fail in"
+    else:
+        parts = sorted({p for a in (hot_agree or agree)[:4] for p in a['parts']})
+        hs = '; '.join(f"{', '.join(h['parts'][:6])}" for h in ps['hotspots'][:3])
+        rec = (f"re-place before finishing: {remaining} item(s) left on the best candidate ({best['backend']}), "
+               f"{round(100 * hot_share)}% of them in congested cells"
+               + (f"; {len(hot_agree)} region(s) where {need}+ of {len(routed)} routers fail in a hotspot, around {', '.join(parts[:12])}" if hot_agree else '')
+               + (f". Placement hotspots: {hs}" if hs else '')
+               + ". Give those parts room (spread, rotate, move decoupling off the escape) and re-run.")
+    out['recommendation'] = rec
+    return out
+
+
+def write_diagnosis(run_dir, diag):
+    lines = ['', '## Hand-finish or re-place?', '', f"**{diag['recommendation']}**", '']
+    c = diag['placement']['congestion']
+    lines.append(f"Placement: congestion peak {c['max']}, hot cells {c['hot_cells']} (>= {c['hot_threshold']}), ratsnest {diag['placement']['ratsnest']['mst_mm']} mm with {diag['placement']['ratsnest']['crossings']} crossings.")
+    for h in diag['placement']['hotspots'][:5]:
+        lines.append(f"- hotspot (peak {h['peak']}, {h['cells']} cells) at {h['box']}: {', '.join(h['parts'][:10])}")
+    if diag['agreement_regions']:
+        lines += ['', 'Where most routers fail (3 mm regions):']
+        for a in diag['agreement_regions'][:8]:
+            lines.append(f"- {a['routers']} routers at {a['at']}{' (hot)' if a['hot'] else ''}: {', '.join(a['parts'][:10])}")
+    with open(Path(run_dir) / 'summary.md', 'a') as f:
+        f.write('\n'.join(lines) + '\n')
+    res = json.loads((Path(run_dir) / 'results.json').read_text())
+    res['diagnosis'] = diag
+    (Path(run_dir) / 'results.json').write_text(json.dumps(res, indent=1) + '\n')
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('target', type=Path)
+    p.add_argument('target', type=Path, help='project dir or board; with --analyze, a route-evals/<run> folder')
     p.add_argument('--backends', help='comma-separated; default: every available one')
     p.add_argument('--time', type=int, default=int(os.getenv('MAXT', '300')), help='per-backend routing limit, seconds')
     p.add_argument('--apply', action='store_true', help='copy the best candidate over the board')
+    p.add_argument('--analyze', action='store_true', help='diagnose an existing run folder: hand-finish or re-place?')
+    p.add_argument('--hand-max', type=int, default=10, help='most remaining items still worth finishing by hand (default 10)')
     a = p.parse_args()
 
     target = a.target.expanduser().resolve()
+    if a.analyze:
+        res = json.loads((target / 'results.json').read_text())
+        diag = diagnose(target, res['results'], res['board'], a.hand_max)
+        write_diagnosis(target, diag)
+        print(diag['recommendation'])
+        return 0
     if target.is_dir():
         project = target if (target / 'index.circuit.tsx').exists() else target / 'pcb'
         board = project / 'index.circuit.kicad_pcb'
@@ -219,7 +325,7 @@ def main():
             cand, code, secs = route_project(project, backend, work, a.time)
         else:
             cand, code, secs = route_board(board, backend, work, a.time)
-        s = score(cand, work) if code == 0 and cand.exists() else None
+        s = score(cand, work, backend.replace(':', '-')) if code == 0 and cand.exists() else None
         r = {'backend': backend, 'ok': s is not None, 'exit': code, 'route_s': secs, 'candidate': str(cand) if s else None, 'score': s}
         results.append(r)
         brief = 'failed (see log)' if s is None else f"shorts {s['shorts']} · open {s['unconnected']} · dfm {s['dfm_actionable']} · size {s['size_violations']} · clearance {s['clearance']} · vias {s['vias']} · {s['track_mm']} mm"
@@ -248,6 +354,13 @@ def main():
             h.write(json.dumps({**meta, **r}) + '\n')
 
     print('\n'.join(lines[6:]))
+    if sum(1 for r in results if r['ok'] and r['backend'] != 'current') >= 1:
+        try:
+            diag = diagnose(work, ranked, board, a.hand_max)
+            write_diagnosis(work, diag)
+            print(f"\n{diag['recommendation']}")
+        except Exception as e:  # the ranking stands without the diagnosis
+            print(f'\n(diagnosis skipped: {e})')
     if best:
         print(f'\nbest: {best["backend"]} -> {best["candidate"]}')
         if a.apply and best['backend'] != 'current':

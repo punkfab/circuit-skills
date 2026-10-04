@@ -942,7 +942,8 @@ policy exists, metrics) and ranked: shorts+crossings, open nets, DFM, floating p
 clearance, vias, track length. Results: `route-evals/<run>/` (candidates, logs, `results.json`,
 `summary.md`) and one line per candidate appended to **`route-evals/history.jsonl`**, with the
 skill's git revision and router versions, so approaches can be compared across runs and upgrades.
-`--apply` copies the winner over the board (the previous one is kept in the run folder).
+`--apply` copies the winner over the board (the previous one is kept in the run folder). After the
+ranking it diagnoses the run: hand-finish the winner, or re-place (see "Is this placement routable?").
 
 einhander, 2026-10-04 (same placement, full route4 pipeline each, JLC rules):
 
@@ -956,6 +957,45 @@ einhander, 2026-10-04 (same placement, full route4 pipeline each, JLC rules):
 No candidate was clean: the winner is a better *starting point* for the finishing tail, not a
 finished board. The ranking puts open nets ahead of fab issues on purpose (an open net is a dead
 board); read the whole table, not just row 1.
+
+## Is this placement routable? Hand-finish or re-place?
+
+Placement decides routing difficulty, so score the placement itself, before any router runs:
+
+```bash
+python3 scripts/placement_score.py board.kicad_pcb [--svg heat.svg] [--json score.json]   # ~0.3 s
+python3 scripts/route_eval.py route-evals/<run> --analyze      # (also runs after every route_eval)
+```
+
+- **Congestion (RUDY):** each signal net's estimated wire (half-perimeter x a Steiner factor for
+  multi-pin nets) spread over its pads' box, plus one escape stub per pin, on a 1 mm grid, divided by
+  what each cell can carry (routing layers x free area, in track pitches). Plane nets are left out.
+- **Ratsnest:** minimum-spanning-tree length and crossings between nets.
+- **Escape:** fine-pitch parts (>= 16 pads, pitch <= 0.65 mm along a pin row): signal pins vs the
+  routing channels around the outline.
+- **Hotspots** are clusters of the board's **top-3% cells**, named by the parts in them. The score is
+  **relative on purpose**: on einhander it never exceeds 0.82 (nothing is "over capacity" in absolute
+  terms) yet **78-100% of every router's defects fall in its top-20% cells**, and its two cores (U1/U2
+  RP2040+flash, J1+CC resistors) are exactly where 3 of 4 routers failed. Use it to compare placements of
+  the same board, and to find where to look, not as a pass/fail line.
+- It exposes the real trade: spreading parts lowers peak congestion but costs wire length (and crossings
+  move); optimise the hotspots, not total length.
+
+**The decision** (`route_eval.py`, written to the run's `summary.md` and `results.json`):
+
+| Best candidate | Where the defects are | Recommendation |
+|---|---|---|
+| passes every gate | — | order-ready: review, `check_board`, order |
+| <= `--hand-max` (10) items | not mostly in hotspots where most routers fail | **hand-finish** the best candidate |
+| more, or concentrated | regions where >= half the routers fail, inside placement hotspots | **re-place** those parts (spread, rotate, move decoupling off the escape), re-run |
+
+The signal no single router gives: **agreement**. Routers failing in the *same* congested region means
+the placement is the problem; routers failing in *different* places is router luck, so finish the best
+one. einhander (2026-10-04): "re-place before finishing: 34 items left on srj:outer, 47% in congested
+cells; regions where 2+ of 4 routers fail in a hotspot around J1, R_CC1, R_CC2, U1", which is the
+same lesson the July session learned by hand (widening the QFN band took unrouted 12 -> 5).
+Thresholds (`--hand-max`, top-decile/top-3%) are first guesses from one board; tune them as
+`route-evals/history.jsonl` grows.
 
 ## Critical routing coverage before release
 
