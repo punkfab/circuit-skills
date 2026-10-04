@@ -44,7 +44,9 @@ export function scriptsDir(): string {
 }
 
 function runGate(name: string, script: string, board: string): Promise<GateResult> {
-  const python = process.env.CIRCUIT_SKILLS_PYTHON ?? "python3";
+  const python = name === "critical_routing"
+    ? (process.env.CIRCUIT_SKILLS_KICAD_PYTHON ?? (process.platform === "linux" && existsSync("/usr/bin/python3") ? "/usr/bin/python3" : "python3"))
+    : (process.env.CIRCUIT_SKILLS_PYTHON ?? "python3");
   return new Promise((resolve) => {
     execFile(python, [script, board], { cwd: path.dirname(board), maxBuffer: 1 << 24, timeout: 300_000 }, (error, stdout, stderr) => {
       const code = error ? (typeof (error as { code?: unknown }).code === "number" ? ((error as { code: number }).code) : -1) : 0;
@@ -60,11 +62,14 @@ function runGate(name: string, script: string, board: string): Promise<GateResul
 
 export async function checkBoard(board: string): Promise<CheckReport> {
   const dir = scriptsDir();
+  const policy = board.replace(/\.kicad_pcb$/i, ".routing-policy.json");
+  const hasCriticalPolicy = existsSync(policy);
   const [gates, drc, info] = await Promise.all([
     Promise.all([
       runGate("drc_check", path.join(dir, "drc_check.py"), board),
       runGate("dfm_check", path.join(dir, "dfm_check.py"), board),
       runGate("check_floating", path.join(dir, "check_floating.py"), board),
+      ...(hasCriticalPolicy ? [runGate("critical_routing", path.join(dir, "check_critical_routing.py"), board)] : []),
     ]),
     boardDrc(board),
     boardInfo(board),
@@ -74,6 +79,7 @@ export async function checkBoard(board: string): Promise<CheckReport> {
   const m = info.metrics;
   const summary = [
     `${path.basename(board)}: ${ok ? "all gates pass" : `FAILING: ${gates.filter((g) => !g.ok).map((g) => g.name).join(", ")}`}`,
+    hasCriticalPolicy ? "Critical routing policy evaluated (screening plus current-board review evidence)." : "Critical routing NOT ASSESSED: no .routing-policy.json; passing geometry gates is not release approval.",
     drcLine && `DRC ${drcLine.replace("SUMMARY: ", "")}`,
     `Routing: ${m.track_mm_total} mm of track in ${m.segments_total} segments, ${m.vias} vias` +
       (info.zoneNets.length ? `; ${m.zone_net_track_mm} mm of it on plane/pour nets (${info.zoneNets.join(", ")})` : ""),

@@ -3259,8 +3259,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path6) {
-      let input2 = path6;
+    function removeDotSegments(path5) {
+      let input2 = path5;
       const output2 = [];
       let nextSlash = -1;
       let len = 0;
@@ -3669,8 +3669,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path6 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path6 && path6 !== "/" ? path6 : void 0;
+        const path5 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path5 && path5 !== "/" ? path5 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -8015,10 +8015,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path6) {
-  if (!path6)
+function getElementAtPath(obj, path5) {
+  if (!path5)
     return obj;
-  return path6.reduce((acc, key) => acc?.[key], obj);
+  return path5.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -8358,11 +8358,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path6, issues) {
+function prefixIssues(path5, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path6);
+    iss.path.unshift(path5);
     return iss;
   });
 }
@@ -8812,16 +8812,16 @@ function flattenError(error62, mapper = (issue2) => issue2.message) {
 }
 function formatError(error62, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error63, path6 = []) => {
+  const processError = (error63, path5 = []) => {
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path6, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path5, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path6, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path6, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else {
-        const fullpath = [...path6, ...issue2.path];
+        const fullpath = [...path5, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -8860,17 +8860,17 @@ function formatError(error62, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error62, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error63, path6 = []) => {
+  const processError = (error63, path5 = []) => {
     var _a3;
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path6, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path5, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path6, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path6, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else {
-        const fullpath = [...path6, ...issue2.path];
+        const fullpath = [...path5, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -8909,8 +8909,8 @@ function treeifyError(error62, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path6 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path6) {
+  const path5 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path5) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -26012,13 +26012,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path6 = ref.slice(1).split("/").filter(Boolean);
-  if (path6.length === 0) {
+  const path5 = ref.slice(1).split("/").filter(Boolean);
+  if (path5.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path6[0] === defsKey) {
-    const key = path6[1] === void 0 ? void 0 : decodeJSONPointerSegment(path6[1]);
+  if (path5[0] === defsKey) {
+    const key = path5[1] === void 0 ? void 0 : decodeJSONPointerSegment(path5[1]);
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -28886,8 +28886,8 @@ function getErrorMap2() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path6, errorMaps, issueData } = params;
-  const fullPath = [...path6, ...issueData.path || []];
+  const { data, path: path5, errorMaps, issueData } = params;
+  const fullPath = [...path5, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -29002,11 +29002,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path6, key) {
+  constructor(parent, value, path5, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path6;
+    this._path = path5;
     this._key = key;
   }
   get path() {
@@ -32558,11 +32558,11 @@ function normalizeObjectSchema(schema) {
   }
   return void 0;
 }
-function getDotPath(path6) {
-  if (path6.length === 0) {
+function getDotPath(path5) {
+  if (path5.length === 0) {
     return "object root";
   }
-  return path6.reduce((acc, seg, index) => {
+  return path5.reduce((acc, seg, index) => {
     if (index === 0) {
       return String(seg);
     }
@@ -36549,7 +36549,32 @@ var EMPTY_COMPLETION_RESULT = {
 };
 
 // src/server.ts
-import path5 from "node:path";
+import path4 from "node:path";
+
+// src/status.ts
+import { stat, readFile as readFile2 } from "node:fs/promises";
+import { createHash } from "node:crypto";
+async function projectStatus(project) {
+  const files = [project.board, project.source];
+  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"), project.board.replace(/\.kicad_pcb$/, ".routing-policy.json"));
+  const stamps = await Promise.all(files.filter((p) => !!p).map(async (p) => {
+    try {
+      const s = await stat(p);
+      return [p, s.mtimeMs, s.size];
+    } catch {
+      return [p, null];
+    }
+  }));
+  let routing = null;
+  if (project.board) {
+    try {
+      const data = JSON.parse(await readFile2(project.board + ".routing.json", "utf8"));
+      if (["freerouting", "fastroute"].includes(data.backend) && typeof data.state === "string") routing = data;
+    } catch {
+    }
+  }
+  return { revision: createHash("sha256").update(JSON.stringify(stamps)).digest("hex"), routing };
+}
 
 // src/checks.ts
 import { execFile as execFile2 } from "node:child_process";
@@ -36559,9 +36584,9 @@ import { fileURLToPath } from "node:url";
 
 // src/views.ts
 import { execFile } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile as readFile2, stat } from "node:fs/promises";
+import { mkdir, readdir, readFile as readFile3, stat as stat2 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -36740,12 +36765,12 @@ function once(key, make) {
   return p;
 }
 async function cacheDir(input2, stamp) {
-  const id = createHash("sha1").update(path.resolve(input2)).digest("hex").slice(0, 16);
+  const id = createHash2("sha1").update(path.resolve(input2)).digest("hex").slice(0, 16);
   const dir = path.join(CACHE, id, String(Math.round(stamp)));
   await mkdir(dir, { recursive: true });
   return dir;
 }
-var mtime = async (p) => (await stat(p)).mtimeMs;
+var mtime = async (p) => (await stat2(p)).mtimeMs;
 function toolError(what, e) {
   const err = e;
   if (err.code === "ENOENT") return new Error(`${what}: the command was not found. Is it installed and on PATH?`);
@@ -36758,7 +36783,7 @@ async function boardInfo(board) {
   const stamp = await mtime(board);
   const hit = boards.get(board);
   if (hit && hit.stamp === stamp) return hit.info;
-  const info = readBoard(await readFile2(board, "utf8"));
+  const info = readBoard(await readFile3(board, "utf8"));
   boards.set(board, { stamp, info });
   return info;
 }
@@ -36780,7 +36805,7 @@ async function layerSvg(board, layer) {
       }
     });
   }
-  return readFile2(out, "utf8");
+  return readFile3(out, "utf8");
 }
 async function boardGlb(board) {
   const dir = await cacheDir(board, await mtime(board));
@@ -36797,7 +36822,7 @@ async function boardGlb(board) {
       }
     });
   }
-  return readFile2(out);
+  return readFile3(out);
 }
 async function boardDrc(board) {
   const stamps = await Promise.all([board, board.replace(/\.kicad_pcb$/, ".kicad_pro"), board.replace(/\.kicad_pcb$/, ".kicad_dru")].map((p) => mtime(p).catch(() => 0)));
@@ -36812,7 +36837,7 @@ async function boardDrc(board) {
       }
     });
   }
-  const json2 = JSON.parse(await readFile2(out, "utf8"));
+  const json2 = JSON.parse(await readFile3(out, "utf8"));
   const toMarker = (kind) => (v) => ({
     kind,
     type: v.type ?? kind,
@@ -36832,7 +36857,7 @@ async function sourceStamp(root) {
       if (e.name.startsWith(".") || ["node_modules", "dist", "build", "fab", "renders"].includes(e.name)) continue;
       const p = path.join(dir, e.name);
       if (e.isDirectory() && depth < 3) await walk(p, depth + 1);
-      else if (e.isFile() && /\.(tsx|ts|json)$/.test(e.name)) newest = Math.max(newest, (await stat(p)).mtimeMs);
+      else if (e.isFile() && /\.(tsx|ts|json)$/.test(e.name)) newest = Math.max(newest, (await stat2(p)).mtimeMs);
     }
   };
   await walk(root, 0);
@@ -36864,7 +36889,7 @@ async function tsciExport(project, format, fileName) {
       if (!existsSync(out)) throw new Error(`tsci export -f ${format} did not write ${fileName}.`);
     });
   }
-  return readFile2(out, "utf8");
+  return readFile3(out, "utf8");
 }
 var schematicSvg = (project) => tsciExport(project, "schematic-svg", "schematic.svg");
 async function netlistText(project) {
@@ -36890,7 +36915,7 @@ function scriptsDir() {
   return found;
 }
 function runGate(name, script, board) {
-  const python = process.env.CIRCUIT_SKILLS_PYTHON ?? "python3";
+  const python = name === "critical_routing" ? process.env.CIRCUIT_SKILLS_KICAD_PYTHON ?? (process.platform === "linux" && existsSync2("/usr/bin/python3") ? "/usr/bin/python3" : "python3") : process.env.CIRCUIT_SKILLS_PYTHON ?? "python3";
   return new Promise((resolve) => {
     execFile2(python, [script, board], { cwd: path2.dirname(board), maxBuffer: 1 << 24, timeout: 3e5 }, (error62, stdout, stderr) => {
       const code = error62 ? typeof error62.code === "number" ? error62.code : -1 : 0;
@@ -36906,11 +36931,14 @@ ${stderr}` : ""}`.trim();
 }
 async function checkBoard(board) {
   const dir = scriptsDir();
+  const policy = board.replace(/\.kicad_pcb$/i, ".routing-policy.json");
+  const hasCriticalPolicy = existsSync2(policy);
   const [gates, drc, info] = await Promise.all([
     Promise.all([
       runGate("drc_check", path2.join(dir, "drc_check.py"), board),
       runGate("dfm_check", path2.join(dir, "dfm_check.py"), board),
-      runGate("check_floating", path2.join(dir, "check_floating.py"), board)
+      runGate("check_floating", path2.join(dir, "check_floating.py"), board),
+      ...hasCriticalPolicy ? [runGate("critical_routing", path2.join(dir, "check_critical_routing.py"), board)] : []
     ]),
     boardDrc(board),
     boardInfo(board)
@@ -36920,118 +36948,53 @@ async function checkBoard(board) {
   const m = info.metrics;
   const summary = [
     `${path2.basename(board)}: ${ok ? "all gates pass" : `FAILING: ${gates.filter((g) => !g.ok).map((g) => g.name).join(", ")}`}`,
+    hasCriticalPolicy ? "Critical routing policy evaluated (screening plus current-board review evidence)." : "Critical routing NOT ASSESSED: no .routing-policy.json; passing geometry gates is not release approval.",
     drcLine && `DRC ${drcLine.replace("SUMMARY: ", "")}`,
     `Routing: ${m.track_mm_total} mm of track in ${m.segments_total} segments, ${m.vias} vias` + (info.zoneNets.length ? `; ${m.zone_net_track_mm} mm of it on plane/pour nets (${info.zoneNets.join(", ")})` : "")
   ].filter(Boolean).join("\n");
   return { board, ok, summary, gates, drc: { counts: drc.counts, unconnected: drc.unconnected }, metrics: m, zoneNets: info.zoneNets };
 }
 
-// src/describe.ts
-import path3 from "node:path";
-
-// src/status.ts
-import { stat as stat2, readFile as readFile3 } from "node:fs/promises";
-import { createHash as createHash2 } from "node:crypto";
-async function projectStatus(project) {
-  const files = [project.board, project.source];
-  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"));
-  const stamps = await Promise.all(files.filter((p) => !!p).map(async (p) => {
-    try {
-      const s = await stat2(p);
-      return [p, s.mtimeMs, s.size];
-    } catch {
-      return [p, null];
-    }
-  }));
-  let routing = null;
-  if (project.board) {
-    try {
-      const data = JSON.parse(await readFile3(project.board + ".routing.json", "utf8"));
-      if (["freerouting", "fastroute"].includes(data.backend) && typeof data.state === "string") routing = data;
-    } catch {
-    }
-  }
-  return { revision: createHash2("sha256").update(JSON.stringify(stamps)).digest("hex"), routing };
-}
-
-// src/describe.ts
-async function describeProject(project) {
-  const info = project.board ? await boardInfo(project.board) : null;
-  return {
-    ...await projectStatus(project),
-    project,
-    layers: project.board ? await boardLayerNames(project.board) : [],
-    board: info ? {
-      copperLayers: info.copperLayers,
-      bbox: info.bbox,
-      footprints: info.footprints,
-      nets: info.nets.length,
-      zoneNets: info.zoneNets,
-      metrics: info.metrics
-    } : null
-  };
-}
-function projectText(d) {
-  const p = d.project;
-  const lines = [`Opened ${p.name} in the circuit viewer (${p.root}).`];
-  lines.push(p.source ? `Design: ${path3.basename(p.source)} (tscircuit)` : "Design: none (no .circuit.tsx; schematic unavailable)");
-  if (d.board) {
-    const b = d.board;
-    const size = b.bbox ? `${b.bbox.w.toFixed(1)} x ${b.bbox.h.toFixed(1)} mm, ` : "";
-    lines.push(
-      `Board: ${path3.basename(p.board)}: ${size}${b.copperLayers.length} copper layers, ${b.footprints} footprints, ${b.nets} nets; ${b.metrics.track_mm_total} mm of track, ${b.metrics.vias} vias`
-    );
-  } else lines.push("Board: none exported yet (run the pcb-layout export/route step).");
-  lines.push("Run check_board for the DRC / DFM / floating-pad gates.");
-  return lines.join("\n");
-}
-function checkText(r, verbose) {
-  if (!verbose) return r.summary;
-  return [r.summary, ...r.gates.map((g) => `
-\u2500\u2500 ${g.name} (${g.ok ? "pass" : `exit ${g.exitCode}`}) \u2500\u2500
-${g.output}`)].join("\n");
-}
-
 // src/project.ts
 import { readdir as readdir2, stat as stat3 } from "node:fs/promises";
-import path4 from "node:path";
+import path3 from "node:path";
 var isFile = async (p) => (await stat3(p).catch(() => null))?.isFile() ?? false;
 var isDir = async (p) => (await stat3(p).catch(() => null))?.isDirectory() ?? false;
 async function filesIn(dir, test) {
   const names = await readdir2(dir).catch(() => []);
-  return names.filter((n) => test(n) && !n.startsWith("~") && !n.startsWith("_autosave") && !n.includes("-backup")).sort().map((n) => path4.join(dir, n));
+  return names.filter((n) => test(n) && !n.startsWith("~") && !n.startsWith("_autosave") && !n.includes("-backup")).sort().map((n) => path3.join(dir, n));
 }
 async function boardIn(dir, preferred) {
-  if (preferred && await isFile(path4.join(dir, preferred))) return path4.join(dir, preferred);
-  if (await isFile(path4.join(dir, "index.circuit.kicad_pcb"))) return path4.join(dir, "index.circuit.kicad_pcb");
+  if (preferred && await isFile(path3.join(dir, preferred))) return path3.join(dir, preferred);
+  if (await isFile(path3.join(dir, "index.circuit.kicad_pcb"))) return path3.join(dir, "index.circuit.kicad_pcb");
   return (await filesIn(dir, (n) => n.endsWith(".kicad_pcb")))[0];
 }
 async function sourceIn(dir, preferred) {
-  if (preferred && await isFile(path4.join(dir, preferred))) return path4.join(dir, preferred);
-  if (await isFile(path4.join(dir, "index.circuit.tsx"))) return path4.join(dir, "index.circuit.tsx");
+  if (preferred && await isFile(path3.join(dir, preferred))) return path3.join(dir, preferred);
+  if (await isFile(path3.join(dir, "index.circuit.tsx"))) return path3.join(dir, "index.circuit.tsx");
   return (await filesIn(dir, (n) => n.endsWith(".circuit.tsx")))[0];
 }
 function named(root, board) {
-  const folder = path4.basename(root);
-  const parent = path4.basename(path4.dirname(root));
+  const folder = path3.basename(root);
+  const parent = path3.basename(path3.dirname(root));
   const base = /^(pcb|board|hardware|kicad)([-_.].*)?$/i.test(folder) ? `${parent}/${folder}` : folder;
-  return board && path4.basename(board) !== "index.circuit.kicad_pcb" ? `${base} \xB7 ${path4.basename(board)}` : base;
+  return board && path3.basename(board) !== "index.circuit.kicad_pcb" ? `${base} \xB7 ${path3.basename(board)}` : base;
 }
 async function resolveProject(input2) {
-  const target = path4.resolve(input2);
+  const target = path3.resolve(input2);
   if (await isFile(target)) {
-    const root = path4.dirname(target);
+    const root = path3.dirname(target);
     if (target.endsWith(".kicad_pcb")) {
       return { name: named(root, target), root, board: target, source: await sourceIn(root) };
     }
     if (target.endsWith(".tsx")) {
-      const board = await boardIn(root, path4.basename(target).replace(/\.tsx$/, ".kicad_pcb"));
+      const board = await boardIn(root, path3.basename(target).replace(/\.tsx$/, ".kicad_pcb"));
       return { name: named(root, board), root, board, source: target };
     }
-    throw new Error(`${path4.basename(target)} is not a board (.kicad_pcb) or a tscircuit design (.circuit.tsx).`);
+    throw new Error(`${path3.basename(target)} is not a board (.kicad_pcb) or a tscircuit design (.circuit.tsx).`);
   }
   if (await isDir(target)) {
-    for (const root of [target, path4.join(target, "pcb")]) {
+    for (const root of [target, path3.join(target, "pcb")]) {
       const [board, source] = await Promise.all([boardIn(root), sourceIn(root)]);
       if (board || source) return { name: named(root, board), root, board, source };
     }
@@ -37053,10 +37016,46 @@ var fileInput = external_exports.object({
   })
 });
 var VIEWS = ["status", "project", "layer", "schematic", "netlist", "glb", "drc", "checks"];
+async function describeProject(project) {
+  const info = project.board ? await boardInfo(project.board) : null;
+  return {
+    ...await projectStatus(project),
+    project,
+    layers: project.board ? await boardLayerNames(project.board) : [],
+    board: info ? {
+      copperLayers: info.copperLayers,
+      bbox: info.bbox,
+      footprints: info.footprints,
+      nets: info.nets.length,
+      zoneNets: info.zoneNets,
+      metrics: info.metrics
+    } : null
+  };
+}
+function projectText(d) {
+  const p = d.project;
+  const lines = [`Opened ${p.name} in the circuit viewer (${p.root}).`];
+  lines.push(p.source ? `Design: ${path4.basename(p.source)} (tscircuit)` : "Design: none (no .circuit.tsx; schematic unavailable)");
+  if (d.board) {
+    const b = d.board;
+    const size = b.bbox ? `${b.bbox.w.toFixed(1)} x ${b.bbox.h.toFixed(1)} mm, ` : "";
+    lines.push(
+      `Board: ${path4.basename(p.board)}: ${size}${b.copperLayers.length} copper layers, ${b.footprints} footprints, ${b.nets} nets; ${b.metrics.track_mm_total} mm of track, ${b.metrics.vias} vias`
+    );
+  } else lines.push("Board: none exported yet (run the pcb-layout export/route step).");
+  lines.push("Run check_board for the DRC / DFM / floating-pad gates.");
+  return lines.join("\n");
+}
+function checkText(r, verbose) {
+  if (!verbose) return r.summary;
+  return [r.summary, ...r.gates.map((g) => `
+\u2500\u2500 ${g.name} (${g.ok ? "pass" : `exit ${g.exitCode}`}) \u2500\u2500
+${g.output}`)].join("\n");
+}
 function pathFromMeta(extra) {
   const meta3 = extra?._meta;
   const p = meta3?.["openai/resource"]?.path;
-  return typeof p === "string" && path5.isAbsolute(p) ? p : void 0;
+  return typeof p === "string" && path4.isAbsolute(p) ? p : void 0;
 }
 var fail = (e) => ({ isError: true, content: [{ type: "text", text: e.message ?? String(e) }] });
 function createServer({ widgetHtml, iconSvg }) {

@@ -6,7 +6,7 @@ import type { Project } from "./project.js";
 /** Cheap polling: do not parse/export a board or run DRC on every tick. */
 export async function projectStatus(project: Project) {
   const files = [project.board, project.source];
-  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"));
+  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"), project.board.replace(/\.kicad_pcb$/, ".routing-policy.json"));
   const stamps = await Promise.all(files.filter((p): p is string => !!p).map(async p => {
     try { const s = await stat(p); return [p, s.mtimeMs, s.size]; }
     catch { return [p, null]; }
