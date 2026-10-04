@@ -16,6 +16,7 @@ import path from "node:path";
 import drcCheck from "../../pcb-layout/scripts/drc_check.py";
 import dfmCheck from "../../pcb-layout/scripts/dfm_check.py";
 import checkFloating from "../../pcb-layout/scripts/check_floating.py";
+import checkCritical from "../../pcb-layout/scripts/check_critical_routing.py";
 import { checkBoard, scriptsDir } from "./checks.js";
 import { checkText, describeProject } from "./describe.js";
 import { boardGeometry } from "./kicad.js";
@@ -31,10 +32,12 @@ async function ensureScripts() {
   } catch {
     /* no checkout nearby: use the embedded copies */
   }
-  const scripts = { "drc_check.py": drcCheck, "dfm_check.py": dfmCheck, "check_floating.py": checkFloating };
+  // check_critical_routing runs only for boards with a .routing-policy.json, on a
+  // Python that has KiCad's pcbnew (CIRCUIT_SKILLS_KICAD_PYTHON; see checks.ts).
+  const scripts = { "drc_check.py": drcCheck, "dfm_check.py": dfmCheck, "check_floating.py": checkFloating, "check_critical_routing.py": checkCritical };
   const id = createHash("sha1").update(Object.values(scripts).join("\0")).digest("hex").slice(0, 12);
   const dir = path.join(os.tmpdir(), "circuit-skills-viewer", `scripts-${id}`);
-  if (!existsSync(path.join(dir, "check_floating.py"))) {
+  if (!existsSync(path.join(dir, "check_critical_routing.py"))) {
     await mkdir(dir, { recursive: true });
     for (const [name, text] of Object.entries(scripts)) await writeFile(path.join(dir, name), text);
   }
