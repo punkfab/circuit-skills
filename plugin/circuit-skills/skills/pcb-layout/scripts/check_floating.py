@@ -91,7 +91,7 @@ for fp in fa(root, "footprint"):
     at = g(fp, "at")
     fx, fy = float(at[1]), float(at[2])
     rot = float(at[3]) if len(at) > 3 else 0.0
-    ca, sa = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+    ca, sa = math.cos(math.radians(-rot)), math.sin(math.radians(-rot))
     for pad in fa(fp, "pad"):
         ptype = pad[2]
         if ptype != "smd":

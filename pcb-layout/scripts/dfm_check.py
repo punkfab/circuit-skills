@@ -81,7 +81,7 @@ vias = []
 for fp in fa(root, "footprint"):
     at = g(fp, "at"); fx, fy = float(at[1]), float(at[2])
     rot = float(at[3]) if len(at) > 3 else 0.0
-    ca, sa = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+    ca, sa = math.cos(math.radians(-rot)), math.sin(math.radians(-rot))
     ref = next((p[2] for p in fa(fp, "property") if p[1] == "Reference"), "?")
     for pad in fa(fp, "pad"):
         if pad[2] in ("thru_hole", "np_thru_hole"):

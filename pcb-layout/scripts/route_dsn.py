@@ -3,9 +3,11 @@
 import argparse, json, os, re, shutil, subprocess, time
 from pathlib import Path
 
-def command(backend, executable, dsn, ses, passes, seconds, report):
+def command(backend, executable, dsn, ses, passes, seconds, report, min_width=None):
     args = [executable, '-de', str(dsn), '-do', str(ses), '-mp', str(passes)]
-    return args + ([f'--max-time={seconds}', f'--report={report}'] if backend == 'fastroute' else ['-oit','0'])
+    args += ([f'--max-time={seconds}', f'--report={report}'] if backend == 'fastroute' else ['-oit','0'])
+    if backend == 'fastroute' and min_width is not None: args += [f'--router.min_trace_width_um={min_width}']
+    return args
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -14,7 +16,9 @@ def main():
     p.add_argument('--executable'); p.add_argument('--board',type=Path)
     p.add_argument('--max-time',type=int,default=int(os.getenv('MAXT','120')))
     p.add_argument('--max-passes',type=int,default=int(os.getenv('MP','12')))
+    p.add_argument('--min-trace-width-um',type=int,help='FastRoute neckdown floor; must meet the board/fab minimum')
     a=p.parse_args()
+    if a.min_trace_width_um is not None and (a.backend!='fastroute' or a.min_trace_width_um<1): p.error('positive neckdown floor requires FastRoute')
     if a.max_time<1 or a.max_passes<1: p.error('time and passes must be positive')
     dsn,ses=a.dsn.resolve(),a.output.resolve()
     if not dsn.is_file(): p.error(f'DSN does not exist: {dsn}')
@@ -44,7 +48,7 @@ def main():
     publish('running','routing candidate; KiCad verification pending')
     try:
         with log.open('w') as out:
-            proc=subprocess.Popen(command(a.backend,exe,dsn,ses,a.max_passes,a.max_time,report),stdout=out,stderr=subprocess.STDOUT,env=env)
+            proc=subprocess.Popen(command(a.backend,exe,dsn,ses,a.max_passes,a.max_time,report,a.min_trace_width_um),stdout=out,stderr=subprocess.STDOUT,env=env)
             try:
                 while proc.poll() is None:
                     if time.monotonic()-started>a.max_time+10:

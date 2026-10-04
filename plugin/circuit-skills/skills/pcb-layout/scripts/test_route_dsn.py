@@ -7,6 +7,7 @@ class RouterTest(unittest.TestCase):
         fast=router.command('fastroute','bin','a.dsn','b.ses',4,20,'report')
         free=router.command('freerouting','bin','a.dsn','b.ses',4,20,'report')
         self.assertIn('--max-time=20',fast);self.assertNotIn('-oit',fast)
+        self.assertIn('--router.min_trace_width_um=127',router.command('fastroute','bin','a','b',4,20,'r',127))
         self.assertIn('-oit',free);self.assertFalse(any(x.startswith('--report') for x in free))
     def test_candidate_and_failure_status(self):
         with tempfile.TemporaryDirectory() as tmp:

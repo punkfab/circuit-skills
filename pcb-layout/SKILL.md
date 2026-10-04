@@ -832,7 +832,8 @@ remains the default (`FREERT=/absolute/path/to/freert`, with its required Java v
 ```bash
 python3 scripts/route_dsn.py build/board.dsn -o build/candidate.ses \
   --backend fastroute --board /absolute/path/board.kicad_pcb \
-  --max-time 120 --max-passes 12
+  --max-time 120 --max-passes 12 --min-trace-width-um 127
+# Use the board/fab minimum for the FastRoute neckdown floor above.
 # --backend freerouting selects the existing backend.
 # Existing pipelines: ROUTER=fastroute FASTROUTE_BIN=/path/fastroute bash scripts/route4.sh
 ```

@@ -71,7 +71,7 @@ def main():
     for fp in fa(root, "footprint"):
         at = g(fp, "at")
         fx, fy, rot = float(at[1]), float(at[2]), (float(at[3]) if len(at) > 3 else 0.0)
-        ca, sa = math.cos(math.radians(rot)), math.sin(math.radians(rot))
+        ca, sa = math.cos(math.radians(-rot)), math.sin(math.radians(-rot))
         for pad in fa(fp, "pad"):
             if len(pad) > 2 and pad[2] == "np_thru_hole":
                 drill = g(pad, "drill")
