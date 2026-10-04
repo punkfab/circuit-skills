@@ -19,6 +19,9 @@ test('live revisions include rules; router updates do not trigger costly board e
     assert.equal((await projectStatus(project)).routing,null);
     await writeFile(board.replace('.kicad_pcb','.kicad_dru'),'(version 1)');
     assert.notEqual((await projectStatus(project)).revision,first.revision);
+    const beforePolicy=await projectStatus(project);
+    await writeFile(board.replace('.kicad_pcb','.routing-policy.json'),'{}');
+    assert.notEqual((await projectStatus(project)).revision,beforePolicy.revision);
     await writeFile(board,'(kicad_pcb (segment))');
     assert.notEqual((await projectStatus(project)).revision,running.revision);
   } finally { await rm(root,{recursive:true,force:true}); }

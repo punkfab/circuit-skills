@@ -853,3 +853,14 @@ Its `--export-only --work-dir build/native` produces a DSN usable by either back
 Native `pcbnew.ExportSpecctraDSN` and `ImportSpecctraSES` were verified with KiCad
 9.0.8; older-version failures described above remain version-specific fallbacks.
 Do not assume that every custom KiCad rule can be represented by DSN.
+
+## Critical routing coverage before release
+
+Passing geometry gates is not a signal-integrity signoff. For USB, Ethernet, crystal,
+and other critical paths, define `<board>.routing-policy.json` and run
+`scripts/check_critical_routing.py <board>`. The viewer runs it when the sidecar exists;
+without a policy it explicitly reports critical routing NOT ASSESSED. See
+[scripts/CRITICAL_ROUTING.md](scripts/CRITICAL_ROUTING.md) for the policy format,
+requirements, and measurement limitations. Review actual stackup/impedance and return
+paths, and bind evidence to the current board SHA. Do not substitute sample coverage
+or total copper mismatch for an impedance or propagation-delay calculation.

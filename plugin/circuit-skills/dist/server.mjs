@@ -36556,7 +36556,7 @@ import { stat, readFile as readFile2 } from "node:fs/promises";
 import { createHash } from "node:crypto";
 async function projectStatus(project) {
   const files = [project.board, project.source];
-  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"));
+  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"), project.board.replace(/\.kicad_pcb$/, ".routing-policy.json"));
   const stamps = await Promise.all(files.filter((p) => !!p).map(async (p) => {
     try {
       const s = await stat(p);
@@ -36915,7 +36915,7 @@ function scriptsDir() {
   return found;
 }
 function runGate(name, script, board) {
-  const python = process.env.CIRCUIT_SKILLS_PYTHON ?? "python3";
+  const python = name === "critical_routing" ? process.env.CIRCUIT_SKILLS_KICAD_PYTHON ?? (process.platform === "linux" && existsSync2("/usr/bin/python3") ? "/usr/bin/python3" : "python3") : process.env.CIRCUIT_SKILLS_PYTHON ?? "python3";
   return new Promise((resolve) => {
     execFile2(python, [script, board], { cwd: path2.dirname(board), maxBuffer: 1 << 24, timeout: 3e5 }, (error62, stdout, stderr) => {
       const code = error62 ? typeof error62.code === "number" ? error62.code : -1 : 0;
@@ -36931,11 +36931,14 @@ ${stderr}` : ""}`.trim();
 }
 async function checkBoard(board) {
   const dir = scriptsDir();
+  const policy = board.replace(/\.kicad_pcb$/i, ".routing-policy.json");
+  const hasCriticalPolicy = existsSync2(policy);
   const [gates, drc, info] = await Promise.all([
     Promise.all([
       runGate("drc_check", path2.join(dir, "drc_check.py"), board),
       runGate("dfm_check", path2.join(dir, "dfm_check.py"), board),
-      runGate("check_floating", path2.join(dir, "check_floating.py"), board)
+      runGate("check_floating", path2.join(dir, "check_floating.py"), board),
+      ...hasCriticalPolicy ? [runGate("critical_routing", path2.join(dir, "check_critical_routing.py"), board)] : []
     ]),
     boardDrc(board),
     boardInfo(board)
@@ -36945,6 +36948,7 @@ async function checkBoard(board) {
   const m = info.metrics;
   const summary = [
     `${path2.basename(board)}: ${ok ? "all gates pass" : `FAILING: ${gates.filter((g) => !g.ok).map((g) => g.name).join(", ")}`}`,
+    hasCriticalPolicy ? "Critical routing policy evaluated (screening plus current-board review evidence)." : "Critical routing NOT ASSESSED: no .routing-policy.json; passing geometry gates is not release approval.",
     drcLine && `DRC ${drcLine.replace("SUMMARY: ", "")}`,
     `Routing: ${m.track_mm_total} mm of track in ${m.segments_total} segments, ${m.vias} vias` + (info.zoneNets.length ? `; ${m.zone_net_track_mm} mm of it on plane/pour nets (${info.zoneNets.join(", ")})` : "")
   ].filter(Boolean).join("\n");
