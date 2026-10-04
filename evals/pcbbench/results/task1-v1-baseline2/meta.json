@@ -1,0 +1,8 @@
+{
+ "run": "task1-v1-baseline2",
+ "model": "claude-opus-5-5",
+ "batch": 25,
+ "cost": {
+  "baseline": 0.3932682000000001
+ }
+}

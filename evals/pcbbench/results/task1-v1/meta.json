@@ -1,0 +1,9 @@
+{
+ "run": "task1-v1",
+ "model": "claude-opus-5-5",
+ "batch": 25,
+ "cost": {
+  "baseline": 3.840950199999999,
+  "skill": 4.198393
+ }
+}
