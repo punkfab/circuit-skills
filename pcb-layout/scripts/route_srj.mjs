@@ -145,6 +145,11 @@ export function boardToSrj(text, opts = {}) {
   // Board-level drilled holes (mounting holes drawn as gr_circle on Edge.Cuts are outline, not obstacles).
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const g of root.filter((e) => Array.isArray(e) && String(e[0]).startsWith("gr_") && str(kid(e, "layer")) === "Edge.Cuts")) {
+    if (g[0] === "gr_circle" && kid(g, "center") && kid(g, "end")) { // a round board: center +- radius
+      const c = kid(g, "center"), e = kid(g, "end"), r = Math.hypot(num(e, 1) - num(c, 1), num(e, 2) - num(c, 2));
+      x0 = Math.min(x0, num(c, 1) - r); x1 = Math.max(x1, num(c, 1) + r); y0 = Math.min(y0, num(c, 2) - r); y1 = Math.max(y1, num(c, 2) + r);
+      continue;
+    }
     for (const k of ["start", "end", "mid", "center"]) { const p = kid(g, k); if (p) { x0 = Math.min(x0, num(p, 1)); x1 = Math.max(x1, num(p, 1)); y0 = Math.min(y0, num(p, 2)); y1 = Math.max(y1, num(p, 2)); } }
     for (const xy of kids(kid(g, "pts") ?? [], "xy")) { x0 = Math.min(x0, num(xy, 1)); x1 = Math.max(x1, num(xy, 1)); y0 = Math.min(y0, num(xy, 2)); y1 = Math.max(y1, num(xy, 2)); }
   }

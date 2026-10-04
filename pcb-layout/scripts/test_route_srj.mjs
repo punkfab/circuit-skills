@@ -85,3 +85,8 @@ test("stripRouting drops top-level tracks and vias only", () => {
   assert.match(out, /\(zone \(net 1\)/);
   assert.match(out, /\(pad "1" thru_hole/);
 });
+
+test("a round board's bounds are its circle, not the circle's center and rim point", () => {
+  const round = BOARD.replace('(gr_rect (start 0 0) (end 40 30) (layer "Edge.Cuts"))', '(gr_circle (center 20 15) (end 35 15) (layer "Edge.Cuts"))');
+  assert.deepEqual(boardToSrj(round, { layers: "auto" }).srj.bounds, { minX: 5, maxX: 35, minY: -30, maxY: 0 });
+});

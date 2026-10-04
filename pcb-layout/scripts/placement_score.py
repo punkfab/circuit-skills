@@ -119,6 +119,11 @@ def read_board(text):
     x0 = y0 = math.inf; x1 = y1 = -math.inf
     for g in root:
         if isinstance(g, list) and str(g[0]).startswith('gr_') and (kid(g, 'layer') or [None, None])[1] == 'Edge.Cuts':
+            if g[0] == 'gr_circle' and kid(g, 'center') and kid(g, 'end'):  # a round board: center +- radius
+                c, e = kid(g, 'center'), kid(g, 'end')
+                r = math.dist((num(c, 1), num(c, 2)), (num(e, 1), num(e, 2)))
+                x0, x1, y0, y1 = min(x0, num(c, 1) - r), max(x1, num(c, 1) + r), min(y0, num(c, 2) - r), max(y1, num(c, 2) + r)
+                continue
             for k in ('start', 'end', 'mid', 'center'):
                 p = kid(g, k)
                 if p:

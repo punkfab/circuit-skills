@@ -13,8 +13,9 @@ Backends (default: every one available here):
 
 A project directory (index.circuit.tsx + node_modules) runs the full route4.sh pipeline per backend
 in its own copy of the project (node_modules linked, this skill's scripts), so planes, fab rules and
-the gates are applied identically; the project itself is not touched. A bare .kicad_pcb can only use
-srj and current. Each candidate is scored with KiCad DRC (the project's rules, JLCPCB if none),
+the gates are applied identically; the project itself is not touched. A bare .kicad_pcb (any KiCad
+board, e.g. the PCBWorld benchmark in evals/pcbworld) can use srj, current, and freerouting/fastroute
+through KiCad's own Specctra export and import (route_kicad_dsn.py); tscircuit needs the project. Each candidate is scored with KiCad DRC (the project's rules, JLCPCB if none),
 dfm_check, check_floating, critical routing when a policy exists, and routing metrics, then ranked:
 
   shorts+crossings, open nets, DFM actionable, floating pads, size violations (track width, via,
@@ -155,10 +156,15 @@ def route_project(project, backend, work, seconds):
 
 
 def route_board(board, backend, work, seconds):
-    _, _, opt = backend.partition(':')
+    name, _, opt = backend.partition(':')
     out = work / f'{backend.replace(":", "-")}.kicad_pcb'
-    code, secs = run(['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)],
-                     work, work / f'{backend.replace(":", "-")}.log', timeout=seconds + 300)
+    if name in ('freerouting', 'fastroute'):
+        # KiCad's own Specctra export/import: works on any KiCad board, not just tscircuit DSNs.
+        py = os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3')
+        cmd = [py, str(HERE / 'route_kicad_dsn.py'), str(board), '-o', str(out), '--backend', name, '--time', str(seconds)]
+    else:
+        cmd = ['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)]
+    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', timeout=seconds + 300)
     pro = board.with_suffix('.kicad_pro')
     if pro.exists() and out.exists():
         shutil.copy(pro, out.with_suffix('.kicad_pro'))
@@ -302,10 +308,11 @@ def main():
         p.error(f'no board at {board}')
     backends = a.backends.split(',') if a.backends else available()
     if not is_project:
-        dropped = [b for b in backends if b.split(':')[0] not in ('srj', 'current')]
+        bare = ('srj', 'current', 'freerouting', 'fastroute')
+        dropped = [b for b in backends if b.split(':')[0] not in bare]
         if dropped:
-            print(f'(a bare board can only use srj and current; skipping {", ".join(dropped)})')
-        backends = [b for b in backends if b.split(':')[0] in ('srj', 'current')]
+            print(f'(a bare board cannot use {", ".join(dropped)}: it needs the tscircuit project; skipping)')
+        backends = [b for b in backends if b.split(':')[0] in bare]
 
     run_id = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     evals = project / 'route-evals'

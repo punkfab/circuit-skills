@@ -936,7 +936,10 @@ python3 scripts/route_eval.py <project dir | board.kicad_pcb> [--backends LIST] 
 Backends: `freerouting`, `fastroute`, `tscircuit[:preset]`, `srj[:all|outer]`, and `current` (the board as
 it is, as a baseline); default is every one installed. A **project** runs `route4.sh` per backend in its
 own copy (node_modules linked, this skill's scripts), so planes, fab rules and gates are identical and
-the project is untouched; a **bare board** gets `srj` and `current`. Every candidate is scored the same
+the project is untouched; a **bare board** (any KiCad board, not just ours) gets `srj`, `current`, and
+`freerouting`/`fastroute` through KiCad's own Specctra export and import (`scripts/route_kicad_dsn.py`:
+strips the routing as text, `ExportSpecctraDSN`, route, `ImportSpecctraSES`, refill zones; don't
+`board.Remove()` tracks in pcbnew Python, the leftover wrappers segfault the garbage collector). Every candidate is scored the same
 way (KiCad DRC under the project's or JLCPCB rules, dfm_check, check_floating, critical routing when a
 policy exists, metrics) and ranked: shorts+crossings, open nets, DFM, floating pads, size violations,
 clearance, vias, track length. Results: `route-evals/<run>/` (candidates, logs, `results.json`,
