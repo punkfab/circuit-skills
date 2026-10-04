@@ -36551,6 +36551,31 @@ var EMPTY_COMPLETION_RESULT = {
 // src/server.ts
 import path4 from "node:path";
 
+// src/status.ts
+import { stat, readFile as readFile2 } from "node:fs/promises";
+import { createHash } from "node:crypto";
+async function projectStatus(project) {
+  const files = [project.board, project.source];
+  if (project.board) files.push(project.board.replace(/\.kicad_pcb$/, ".kicad_pro"), project.board.replace(/\.kicad_pcb$/, ".kicad_dru"));
+  const stamps = await Promise.all(files.filter((p) => !!p).map(async (p) => {
+    try {
+      const s = await stat(p);
+      return [p, s.mtimeMs, s.size];
+    } catch {
+      return [p, null];
+    }
+  }));
+  let routing = null;
+  if (project.board) {
+    try {
+      const data = JSON.parse(await readFile2(project.board + ".routing.json", "utf8"));
+      if (["freerouting", "fastroute"].includes(data.backend) && typeof data.state === "string") routing = data;
+    } catch {
+    }
+  }
+  return { revision: createHash("sha256").update(JSON.stringify(stamps)).digest("hex"), routing };
+}
+
 // src/checks.ts
 import { execFile as execFile2 } from "node:child_process";
 import { existsSync as existsSync2 } from "node:fs";
@@ -36559,9 +36584,9 @@ import { fileURLToPath } from "node:url";
 
 // src/views.ts
 import { execFile } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile as readFile2, stat } from "node:fs/promises";
+import { mkdir, readdir, readFile as readFile3, stat as stat2 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -36740,12 +36765,12 @@ function once(key, make) {
   return p;
 }
 async function cacheDir(input2, stamp) {
-  const id = createHash("sha1").update(path.resolve(input2)).digest("hex").slice(0, 16);
+  const id = createHash2("sha1").update(path.resolve(input2)).digest("hex").slice(0, 16);
   const dir = path.join(CACHE, id, String(Math.round(stamp)));
   await mkdir(dir, { recursive: true });
   return dir;
 }
-var mtime = async (p) => (await stat(p)).mtimeMs;
+var mtime = async (p) => (await stat2(p)).mtimeMs;
 function toolError(what, e) {
   const err = e;
   if (err.code === "ENOENT") return new Error(`${what}: the command was not found. Is it installed and on PATH?`);
@@ -36758,7 +36783,7 @@ async function boardInfo(board) {
   const stamp = await mtime(board);
   const hit = boards.get(board);
   if (hit && hit.stamp === stamp) return hit.info;
-  const info = readBoard(await readFile2(board, "utf8"));
+  const info = readBoard(await readFile3(board, "utf8"));
   boards.set(board, { stamp, info });
   return info;
 }
@@ -36780,7 +36805,7 @@ async function layerSvg(board, layer) {
       }
     });
   }
-  return readFile2(out, "utf8");
+  return readFile3(out, "utf8");
 }
 async function boardGlb(board) {
   const dir = await cacheDir(board, await mtime(board));
@@ -36797,10 +36822,11 @@ async function boardGlb(board) {
       }
     });
   }
-  return readFile2(out);
+  return readFile3(out);
 }
 async function boardDrc(board) {
-  const dir = await cacheDir(board, await mtime(board));
+  const stamps = await Promise.all([board, board.replace(/\.kicad_pcb$/, ".kicad_pro"), board.replace(/\.kicad_pcb$/, ".kicad_dru")].map((p) => mtime(p).catch(() => 0)));
+  const dir = await cacheDir(board + JSON.stringify(stamps), Math.max(...stamps));
   const out = path.join(dir, "drc.json");
   if (!existsSync(out)) {
     await once(out, async () => {
@@ -36811,7 +36837,7 @@ async function boardDrc(board) {
       }
     });
   }
-  const json2 = JSON.parse(await readFile2(out, "utf8"));
+  const json2 = JSON.parse(await readFile3(out, "utf8"));
   const toMarker = (kind) => (v) => ({
     kind,
     type: v.type ?? kind,
@@ -36831,7 +36857,7 @@ async function sourceStamp(root) {
       if (e.name.startsWith(".") || ["node_modules", "dist", "build", "fab", "renders"].includes(e.name)) continue;
       const p = path.join(dir, e.name);
       if (e.isDirectory() && depth < 3) await walk(p, depth + 1);
-      else if (e.isFile() && /\.(tsx|ts|json)$/.test(e.name)) newest = Math.max(newest, (await stat(p)).mtimeMs);
+      else if (e.isFile() && /\.(tsx|ts|json)$/.test(e.name)) newest = Math.max(newest, (await stat2(p)).mtimeMs);
     }
   };
   await walk(root, 0);
@@ -36863,7 +36889,7 @@ async function tsciExport(project, format, fileName) {
       if (!existsSync(out)) throw new Error(`tsci export -f ${format} did not write ${fileName}.`);
     });
   }
-  return readFile2(out, "utf8");
+  return readFile3(out, "utf8");
 }
 var schematicSvg = (project) => tsciExport(project, "schematic-svg", "schematic.svg");
 async function netlistText(project) {
@@ -36926,10 +36952,10 @@ async function checkBoard(board) {
 }
 
 // src/project.ts
-import { readdir as readdir2, stat as stat2 } from "node:fs/promises";
+import { readdir as readdir2, stat as stat3 } from "node:fs/promises";
 import path3 from "node:path";
-var isFile = async (p) => (await stat2(p).catch(() => null))?.isFile() ?? false;
-var isDir = async (p) => (await stat2(p).catch(() => null))?.isDirectory() ?? false;
+var isFile = async (p) => (await stat3(p).catch(() => null))?.isFile() ?? false;
+var isDir = async (p) => (await stat3(p).catch(() => null))?.isDirectory() ?? false;
 async function filesIn(dir, test) {
   const names = await readdir2(dir).catch(() => []);
   return names.filter((n) => test(n) && !n.startsWith("~") && !n.startsWith("_autosave") && !n.includes("-backup")).sort().map((n) => path3.join(dir, n));
@@ -36985,10 +37011,11 @@ var fileInput = external_exports.object({
     resourceUri: external_exports.string().min(1).describe("Opaque host URI for the file")
   })
 });
-var VIEWS = ["project", "layer", "schematic", "netlist", "glb", "drc", "checks"];
+var VIEWS = ["status", "project", "layer", "schematic", "netlist", "glb", "drc", "checks"];
 async function describeProject(project) {
   const info = project.board ? await boardInfo(project.board) : null;
   return {
+    ...await projectStatus(project),
     project,
     layers: project.board ? await boardLayerNames(project.board) : [],
     board: info ? {
@@ -37146,6 +37173,9 @@ ${text}` }] };
         };
         let data;
         switch (view) {
+          case "status":
+            data = await projectStatus(project);
+            break;
           case "project":
             data = await describeProject(project);
             break;

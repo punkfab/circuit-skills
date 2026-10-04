@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
 import path from "node:path";
+import { projectStatus } from "./status.js";
 import { z } from "zod";
 import { checkBoard, type CheckReport } from "./checks.js";
 import { resolveProject, type Project } from "./project.js";
@@ -38,7 +39,7 @@ const fileInput = z.object({
   }),
 });
 
-const VIEWS = ["project", "layer", "schematic", "netlist", "glb", "drc", "checks"] as const;
+const VIEWS = ["status", "project", "layer", "schematic", "netlist", "glb", "drc", "checks"] as const;
 
 export interface ServerOptions {
   /** The built widget page (dist/widget.html). */
@@ -51,6 +52,7 @@ export interface ServerOptions {
 async function describeProject(project: Project) {
   const info = project.board ? await boardInfo(project.board) : null;
   return {
+    ...(await projectStatus(project)),
     project,
     layers: project.board ? await boardLayerNames(project.board) : [],
     board: info
@@ -230,6 +232,9 @@ export function createServer({ widgetHtml, iconSvg }: ServerOptions): McpServer 
         };
         let data: Record<string, unknown>;
         switch (view) {
+          case "status":
+            data = await projectStatus(project);
+            break;
           case "project":
             data = await describeProject(project);
             break;

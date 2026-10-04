@@ -820,3 +820,35 @@ Bundled and ready to copy into a project: `scripts/genpinmap.mjs` + `scripts/pla
 `scripts/`, wired to the Makefile targets above). `rules/<fab>.kicad_dru` load into KiCad Board Setup ▸
 Custom Rules. `freeroute.sh` needs a Freerouting CLI (`~/.local/bin/freert`, override `FREERT=`).
 Run `tsci dev <f>` (https://localhost:3020) for the interactive viewer + the Gerber/BOM/PnP export UI.
+
+
+### Selectable local routing and live progress
+
+Both Freerouting and [FastRoute](https://github.com/parisxmas/fastroute) are supported.
+FastRoute is optional: download the matching official local CLI release and set
+`FASTROUTE_BIN=/absolute/path/to/fastroute`; no design upload is needed. Freerouting
+remains the default (`FREERT=/absolute/path/to/freert`, with its required Java version).
+
+```bash
+python3 scripts/route_dsn.py build/board.dsn -o build/candidate.ses \
+  --backend fastroute --board /absolute/path/board.kicad_pcb \
+  --max-time 120 --max-passes 12
+# --backend freerouting selects the existing backend.
+# Existing pipelines: ROUTER=fastroute FASTROUTE_BIN=/path/fastroute bash scripts/route4.sh
+```
+
+Choose a fresh output path for each direct run. The runner writes a log and, for
+FastRoute, its native JSON report. With `--board`, it atomically updates
+`board.kicad_pcb.routing.json`; the viewer displays progress automatically while visible.
+Saved board changes also refresh without another `open_board`, retaining the view,
+zoom, layers, marker visibility and netlist filter. No expensive DRC runs on unchanged polls.
+A DSN session/checkpoint is **only a candidate**: import it, refill zones, and run
+`check_board`; router violation counts are not KiCad DRC results. Neither backend
+promises full routing. Keep placement/routing iteration and all completion gates.
+
+For an existing native KiCad board, FastRoute's official repository includes
+`integrations/kicad/plugins/route_cli.py` for local headless export, routing and import.
+Its `--export-only --work-dir build/native` produces a DSN usable by either backend.
+Native `pcbnew.ExportSpecctraDSN` and `ImportSpecctraSES` were verified with KiCad
+9.0.8; older-version failures described above remain version-specific fallbacks.
+Do not assume that every custom KiCad rule can be represented by DSN.

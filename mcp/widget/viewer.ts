@@ -20,6 +20,8 @@ interface Project {
   source?: string;
 }
 interface Described {
+  revision?: string;
+  routing?: { backend: string; state: string; message?: string };
   project: Project;
   layers: string[];
   board: null | {
@@ -87,10 +89,12 @@ function message(title: string, text: string) {
 // ---- server calls ---------------------------------------------------------------
 
 async function loadView<T>(view: string, extra: Record<string, unknown> = {}): Promise<T> {
+  const epoch = watchEpoch, target = projectPath;
   await whenConnected;
   const args: Record<string, unknown> = { view, ...extra };
   if (projectPath) args.path = projectPath;
   const result = await app.callServerTool({ name: "load_view", arguments: args });
+  if (epoch !== watchEpoch || target !== projectPath) throw new Error("Project changed while loading; retry this view.");
   const text = result.content?.find((c) => c.type === "text") as { text?: string } | undefined;
   if (result.isError) throw new Error(text?.text ?? `Could not load ${view}.`);
   return result.structuredContent as T;
@@ -102,6 +106,7 @@ const tabButtons = [...document.querySelectorAll<HTMLButtonElement>("#tabs butto
 for (const b of tabButtons) b.addEventListener("click", () => void show(b.dataset.tab as Tab));
 
 async function show(next: Tab) {
+  const epoch = watchEpoch;
   tab = next;
   for (const b of tabButtons) b.setAttribute("aria-selected", String(b.dataset.tab === next));
   for (const v of document.querySelectorAll<HTMLElement>(".view")) v.hidden = v.dataset.view !== next;
@@ -115,6 +120,7 @@ async function show(next: Tab) {
     else if (next === "3d") await loadThree();
     else if (next === "checks") await runChecks();
   } catch (e) {
+    if (epoch !== watchEpoch) return;
     loaded.delete(next);
     if (tab === next) message("Couldn't load this view", (e as Error).message);
   }
@@ -136,10 +142,12 @@ function reset() {
   $("sch-canvas").replaceChildren();
   $("netlist").textContent = "";
   $("checks").replaceChildren();
+  boardView?.pz.dispose();
   boardView = null;
 }
 
 async function openProject(d: Described) {
+  clearTimeout(watchTimer); watchEpoch++;
   reset();
   current = d;
   projectPath = d.project.board ?? d.project.source ?? d.project.root;
@@ -153,6 +161,7 @@ async function openProject(d: Described) {
   setStatus(m ? `${d.board!.footprints} parts · ${d.board!.nets} nets · ${m.track_mm_total} mm track · ${m.vias} vias` : "no board exported yet");
   reportContext();
   await show(d.project.board ? "board" : "schematic");
+  startWatching();
 }
 
 async function openPath(p: string) {
@@ -204,6 +213,55 @@ function remember(p: string) {
   } catch {
     /* storage unavailable */
   }
+}
+
+// Saved boards refresh automatically; router progress is separate from KiCad DRC.
+let watchTimer: ReturnType<typeof setTimeout> | undefined;
+let watching = false;
+let watchEpoch = 0;
+let stableRevision: string | undefined;
+function showProgress(updateMetrics = false) {
+  const m = current?.board?.metrics, r = current?.routing;
+  $("progress").textContent = r ? `${r.backend}: ${r.state}${r.message ? " · " + r.message : ""}` : "live";
+  if (updateMetrics && tab === "board" && m) setStatus(`${current!.board!.footprints} parts · ${m.track_mm_total} mm track · ${m.vias} vias`);
+}
+function startWatching() {
+  clearTimeout(watchTimer);
+  watching = true;
+  const epoch = ++watchEpoch;
+  stableRevision = current?.revision;
+  const tick = async () => {
+    if (!watching || epoch !== watchEpoch) return;
+    try {
+      if (!document.hidden && current) {
+        const target = projectPath;
+        const status = await loadView<{ revision: string; routing: Described["routing"] }>("status");
+        if (epoch !== watchEpoch || target !== projectPath) return;
+        current.routing = status.routing;
+        if (status.revision !== current.revision) {
+          // Wait for two matching samples, so a half-written file is not displayed.
+          if (status.revision === stableRevision) {
+            const d = await loadView<Described>("project");
+            if (epoch !== watchEpoch || target !== projectPath) return;
+            const selected = tab;
+            const box = boardView?.pz.snapshot();
+            const choices = new Map([...document.querySelectorAll<HTMLInputElement>("#layers input, #drc input")].map(x => [x.dataset.key, x.checked]));
+            reset(); current = d; refreshTabs();
+            await show(selected);
+            if (epoch !== watchEpoch) return;
+            if (box) boardView?.pz.restore(box);
+            for (const input of document.querySelectorAll<HTMLInputElement>("#layers input, #drc input")) {
+              if (choices.has(input.dataset.key)) { input.checked = choices.get(input.dataset.key)!; input.dispatchEvent(new Event("change")); }
+            }
+            showProgress(true); reportContext();
+          }
+          stableRevision = status.revision;
+        } else showProgress();
+      }
+    } catch (e) { if (epoch === watchEpoch) setStatus(`Live update waiting: ${(e as Error).message}`, "bad"); }
+    finally { if (watching && epoch === watchEpoch) watchTimer = setTimeout(tick, 2000); }
+  };
+  watchTimer = setTimeout(tick, 2000);
 }
 
 // ---- board ------------------------------------------------------------------------
@@ -271,6 +329,7 @@ async function loadBoard() {
     const label = document.createElement("label");
     label.innerHTML = `<input type="checkbox"${startsVisible(layer) ? " checked" : ""}><span class="swatch" style="background:${layerColor(layer)}"></span><span></span>`;
     (label.lastElementChild as HTMLElement).textContent = layer;
+    label.querySelector("input")!.dataset.key = layer;
     label.querySelector("input")!.addEventListener("change", (e) => (g.style.display = (e.target as HTMLInputElement).checked ? "" : "none"));
     list.appendChild(label);
   }
@@ -285,7 +344,7 @@ async function loadBoard() {
       for (const child of [...root.childNodes]) g.appendChild(document.importNode(child, true));
     }),
   );
-  setStatus(statusEl.textContent === "exporting layers…" ? "" : statusEl.textContent ?? "");
+  showProgress(true);
   await loadMarkers();
   pz.onChange = () => sizeMarkers();
   sizeMarkers();
@@ -340,6 +399,7 @@ async function loadMarkers() {
     label.innerHTML = `<input type="checkbox"${visible ? " checked" : ""}><span class="swatch" style="background:${color}"></span><span class="t"></span><span class="count">${byType.get(type)!.length}</span>`;
     (label.querySelector(".t") as HTMLElement).textContent = type.replace(/_/g, " ");
     const box = label.querySelector("input")!;
+    box.dataset.key = type;
     box.addEventListener("change", () => (g.style.display = box.checked ? "" : "none"));
     label.querySelector(".t")!.addEventListener("click", (e) => {
       e.preventDefault();
@@ -546,7 +606,7 @@ app.addEventListener("toolinput", ({ arguments: args }) => {
     return;
   }
   const p = (args as { path?: unknown } | undefined)?.path;
-  if (typeof p === "string") setStatus("opening…");
+  if (typeof p === "string" && p !== projectPath) void openPath(p);
 });
 
 app.ontoolresult = (result) => {
@@ -556,11 +616,14 @@ app.ontoolresult = (result) => {
     return;
   }
   const d = result.structuredContent as Partial<Described> | undefined;
-  if (d?.project) void openProject(d as Described);
+  if (d?.project && !(current && current.revision === d.revision && current.project.board === d.project.board)) void openProject(d as Described);
   else if (!viaFileEntry) showPicker();
 };
 
-app.onteardown = async () => ({});
+app.onteardown = async () => {
+  clearTimeout(watchTimer); watching = false; watchEpoch++; boardView?.pz.dispose();
+  return {};
+};
 
 function applyHostContext(ctx: McpUiHostContext) {
   if (ctx.theme) applyDocumentTheme(ctx.theme);

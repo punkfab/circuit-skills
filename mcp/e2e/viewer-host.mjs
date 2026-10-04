@@ -8,7 +8,7 @@
 import { chromium } from "playwright-core";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { loadAssets } from "../dist/assets.js";
@@ -187,6 +187,37 @@ const tab = (w, t) => w.click(`#tabs button[data-tab="${t}"]`);
   await page.screenshot({ path: `${OUT}/9-narrow.png` });
   check("no page errors (sidebar)", errors.length === 0, errors.join(" | "));
   await page.close();
+}
+
+// ---- live refresh: actual exports, tool-input-only host, preserved viewport/layers ----
+{
+  const root = await mkdtemp(path.join(os.tmpdir(), "circuit-live-e2e-"));
+  const board = path.join(root, "live.kicad_pcb");
+  const content = await readFile(path.join(FIXTURE,"pcb-rerun","index.circuit.kicad_pcb"),"utf8");
+  await writeFile(board, content);
+  const {page,w,errors} = await mount({input:{path:board}});
+  try {
+    const ready = await until(() => w.evaluate(() => document.querySelectorAll("#drc label").length > 0));
+    check("tool input opens the project without requiring a tool result", !!ready);
+    await w.click('#layers input[data-key="In1.Cu"]');
+    await w.click('#drc input[data-key="unconnected_items"]');
+    await w.click('#drc label:has-text("unconnected items") .t');
+    const before = await w.evaluate(() => document.querySelector("#board-canvas svg").getAttribute("viewBox"));
+    const callsBefore = await page.evaluate(() => window.H.calls.filter(x => x === "project").length);
+    await writeFile(board+".routing.json",JSON.stringify({backend:"fastroute",state:"running",message:"test progress"}));
+    check("router progress appears without reopening", !!await until(() => w.evaluate(() => document.getElementById("progress").textContent.includes("test progress"))));
+    await writeFile(board,content+"\n");
+    check("a saved board automatically refreshes", !!await until(() => page.evaluate(n => window.H.calls.filter(x => x === "project").length > n,callsBefore)));
+    await until(() => w.evaluate(() => document.querySelectorAll("#drc label").length > 0));
+    const after = await w.evaluate(() => ({box:document.querySelector("#board-canvas svg").getAttribute("viewBox"),inner:document.querySelector('#layers input[data-key="In1.Cu"]').checked}));
+    check("live refresh retains zoom and layer choice",after.box === before && after.inner);
+    await tab(w,"netlist");
+    await w.fill("#net-filter","QSPI");
+    await writeFile(board,content+"\n\n");
+    await page.waitForTimeout(6500);
+    check("live refresh keeps the selected tab and filter",await w.evaluate(() => document.querySelector('#tabs button[data-tab="netlist"]').getAttribute("aria-selected")==="true" && document.getElementById("net-filter").value==="QSPI"));
+    check("no page errors (live)",errors.length===0,errors.join(" | "));
+  } finally { await page.close(); await rm(root,{recursive:true,force:true}); }
 }
 
 await browser.close();

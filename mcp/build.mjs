@@ -31,7 +31,7 @@ const js = viewer.outputFiles[0].text.replaceAll("</script", "<\\/script");
 const html = (await readFile("widget/viewer.html", "utf-8")).replace("/*%%VIEWER_JS%%*/", () => js);
 
 // --- server, unbundled (tests) -------------------------------------------------
-const ENTRIES = ["stdio", "server", "assets", "project", "views", "kicad", "checks"];
+const ENTRIES = ["stdio", "server", "assets", "project", "views", "kicad", "checks", "status"];
 await build({
   entryPoints: ENTRIES.map((n) => `src/${n}.ts`),
   outdir: "dist",

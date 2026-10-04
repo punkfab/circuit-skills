@@ -52,12 +52,11 @@ python3 scripts/add_npth_keepouts.py  "$BOARD" "$DSN" --margin 0.3 --min-hole 0.
 
 echo "[6/9] Freerouting v2.2.4 (signals + VBUS; planes & holes avoided)"
 rm -f "$SES"
-"$HOME/.local/bin/freert224" -de "$DSN" -do "$SES" 2>&1 | grep -iE 'session completed|unrouted' | tail -1
+FREERT="${FREERT:-$HOME/.local/bin/freert224}" python3 scripts/route_dsn.py "$DSN" -o "$SES" --backend "${ROUTER:-freerouting}" --board "$BOARD" --max-time "${MAXT:-120}" --max-passes "${MP:-12}"
 [ -s "$SES" ] || { echo "no SES written"; exit 1; }
 echo "      SES: $(grep -c '(wire' "$SES") wires, $(grep -c '(via' "$SES") vias"
 
 echo "[7/9] launch pcbnew, wait for IPC socket"
-pkill -9 java 2>/dev/null || true
 pkill -f 'pcbnew index' 2>/dev/null || true
 rm -f /tmp/kicad/api.sock
 DISPLAY="$DISPLAY" pcbnew "$BOARD" >build/pcbnew.log 2>&1 &

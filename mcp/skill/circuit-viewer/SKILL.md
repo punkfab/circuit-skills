@@ -40,3 +40,11 @@ fabbed, including Freerouting's copper and any hand finishing.
 - The viewer reports what is open (and the last check summary) back to you as context.
 - If a view fails, the message names the tool that failed: `kicad-cli` must be on PATH (KiCad 9+),
   and the schematic/netlist need tscircuit installed in the project (`npm install`).
+
+
+The viewer polls saved board, project rules and selected source changes every two
+seconds while visible. Save results to the board path already open to update the
+view without calling `open_board` again. The view, zoom, layer/marker choices and
+netlist filter persist. Use pcb-layout's `route_dsn.py --board /absolute/board.kicad_pcb`
+for live Freerouting or FastRoute progress; a router candidate still needs import,
+zone fill and `check_board` before it can be called complete.

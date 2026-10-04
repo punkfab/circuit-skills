@@ -9,6 +9,7 @@ export interface Box {
 }
 
 export class PanZoom {
+  private observer: ResizeObserver;
   private box: Box;
   private home: Box;
   private drag: { id: number; x: number; y: number; box: Box } | null = null;
@@ -26,8 +27,13 @@ export class PanZoom {
     svg.addEventListener("pointerup", (e) => this.onUp(e));
     svg.addEventListener("pointercancel", (e) => this.onUp(e));
     svg.addEventListener("dblclick", () => this.fit());
-    new ResizeObserver(() => this.apply()).observe(svg);
+    this.observer = new ResizeObserver(() => this.apply());
+    this.observer.observe(svg);
   }
+
+  snapshot(): Box { return { ...this.box }; }
+  restore(box: Box) { this.box = { ...box }; this.apply(); }
+  dispose() { this.observer.disconnect(); }
 
   /** Show the whole home box. */
   fit() {

@@ -24,7 +24,7 @@ FREERT=${FREERT:-$HOME/.local/bin/freert}
 MP=${MP:-12}; OIT=${OIT:-0}; MAXT=${MAXT:-120}
 arg=${1:-index.circuit.tsx}
 mkdir -p build; LOG=build/freeroute.log
-[ -x "$FREERT" ] || { echo "freerouting CLI not at $FREERT (set FREERT=)"; exit 1; }
+[ "${ROUTER:-freerouting}" = "fastroute" ] || [ -x "$FREERT" ] || { echo "freerouting CLI not at $FREERT (set FREERT=)"; exit 1; }
 
 case "$arg" in
   *.dsn) dsn="$arg"; base=$(basename "$dsn" .dsn) ;;
@@ -35,17 +35,9 @@ esac
 [ -f "$dsn" ] || { echo "no DSN found ($dsn) — see $LOG"; exit 1; }
 ses="build/$base.ses"
 
-echo "freerouting $dsn  (MP=$MP OIT=$OIT, timeout ${MAXT}s) ..."
+echo "${ROUTER:-freerouting} $dsn (timeout ${MAXT}s)"
 rm -f "$ses"
-JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" timeout "$MAXT" \
-  "$FREERT" -de "$dsn" -do "$ses" -mp "$MP" -oit "$OIT" >> "$LOG" 2>&1
-rc=$?
-# Freerouting writes an empty "(host_version )" that KiCad's parser rejects; patch it.
-[ -f "$ses" ] && sed -i 's/(host_version )/(host_version "freerouting")/' "$ses"
-last=$(grep -oE 'score of [0-9.]+ \([0-9]+ unrouted\)' "$LOG" | tail -1)
-echo "  ${last:-see $LOG}   (freert rc=$rc)"
-if [ -f "$ses" ]; then
-  echo "  -> $ses ($(grep -c '(wire' "$ses") wires).  Inject: python3 scripts/apply_ses_ipc.py $ses --save --clear"
-else
-  echo "  NO .ses written (rc=$rc). If it timed out at the cap, lower MP or check $LOG."
-fi
+args=("$dsn" -o "$ses" --backend "${ROUTER:-freerouting}" --max-time "$MAXT" --max-passes "$MP")
+[ -z "${BOARD:-}" ] || args+=(--board "$BOARD")
+export FREERT
+python3 "$(dirname "$0")/route_dsn.py" "${args[@]}"

@@ -124,7 +124,8 @@ export interface DrcReport {
 }
 
 export async function boardDrc(board: string): Promise<DrcReport> {
-  const dir = await cacheDir(board, await mtime(board));
+  const stamps = await Promise.all([board, board.replace(/\.kicad_pcb$/, ".kicad_pro"), board.replace(/\.kicad_pcb$/, ".kicad_dru")].map(p => mtime(p).catch(() => 0)));
+  const dir = await cacheDir(board + JSON.stringify(stamps), Math.max(...stamps));
   const out = path.join(dir, "drc.json");
   if (!existsSync(out)) {
     await once(out, async () => {
