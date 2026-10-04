@@ -202,10 +202,14 @@ def defect_points(drc_json):
 def diagnose(run_dir, results, board, hand_max=10, region_mm=3.0):
     """Placement score + where each candidate fails -> a recommendation.
 
-    Two signals decide it. (1) Agreement: regions where most routers fail point at the placement;
-    routers failing in different places is router luck. (2) Congestion: defects in the placement's
-    hot cells (top decile of RUDY) point at the placement too. A best candidate with few defects
-    outside both is worth finishing by hand."""
+    The candidate judged is the one CLOSEST TO DONE (fewest remaining items), not the top-ranked one:
+    a router that leaves 2 open nets and nothing else is a 2-item hand-finish even when another
+    router connected everything with 40 clearance hits. Within --hand-max items it is a hand-finish.
+    Beyond that, two signals point at the placement: (1) agreement, regions where most routers fail
+    (different places is router luck), and (2) congestion, defects in the placement's hot cells.
+    Calibrated on PCBWorld D3 (evals/pcbworld): all 23 boards no router finished had a candidate
+    1-5 items from done, and their designers routed every one cleanly with the same placement, so
+    a hotspot alone never vetoes a short hand-finish; it is reported as a warning."""
     sys.path.insert(0, str(HERE))
     import placement_score
     ps = placement_score.score(str(board))
@@ -235,28 +239,31 @@ def diagnose(run_dir, results, board, hand_max=10, region_mm=3.0):
             agree.append({'at': [x0, y0, x0 + region_mm, y0 + region_mm], 'routers': len(who), 'hot': util(x0 + region_mm / 2, y0 + region_mm / 2) >= hot or any(util(x0 + a, y0 + b) >= hot for a in (0.5, 1.5, 2.5) for b in (0.5, 1.5, 2.5)), 'parts': parts})
     agree.sort(key=lambda a: (-a['routers'], -a['hot']))
 
-    best = next((r for r in sorted(routed, key=lambda r: rank_key(r['score']))), None)
+    def items(sc):
+        return sc['shorts'] + sc['unconnected'] + sc['dfm_actionable'] + sc['floating'] + sc['size_violations'] + sc['clearance']
+
+    best = min(routed, key=lambda r: (items(r['score']), rank_key(r['score'])), default=None)
     out = {'placement': {k: ps[k] for k in ('congestion', 'ratsnest', 'escape', 'hotspots', 'routing_layers', 'plane_nets')},
            'agreement_regions': agree, 'hand_max': hand_max}
     if not best:
         out['recommendation'] = 're-place: no router produced a candidate'
         return out
-    b = best['score']
+    remaining = items(best['score'])
     pts = per.get(best['backend'], [])
     in_hot = sum(1 for _, x, y in pts if util(x, y) >= hot)
-    blocking = b['shorts'] + b['unconnected'] + b['dfm_actionable'] + b['floating'] + b['size_violations']
-    remaining = blocking + b['clearance']
     hot_share = in_hot / len(pts) if pts else 0.0
     hot_agree = [a for a in agree if a['hot']]
     out.update(best=best['backend'], remaining=remaining, defects_in_hot_cells=round(hot_share, 2))
     if remaining == 0:
         rec = f"order-ready candidate: {best['backend']} passes every gate; review it and run check_board before ordering"
-    elif remaining <= hand_max and not (hot_agree and hot_share >= 0.5):
-        rec = f"hand-finish {best['backend']}: {remaining} item(s), {round(100 * hot_share)}% in congested cells, no placement hotspot that most routers fail in"
+    elif remaining <= hand_max:
+        warn = (f"; watch {', '.join(sorted({p for a in hot_agree[:3] for p in a['parts']})[:8])}, where {need}+ routers fail in a hotspot"
+                if hot_agree and hot_share >= 0.5 else '')
+        rec = f"hand-finish {best['backend']}: {remaining} item(s) left, {round(100 * hot_share)}% in congested cells{warn}"
     else:
         parts = sorted({p for a in (hot_agree or agree)[:4] for p in a['parts']})
         hs = '; '.join(f"{', '.join(h['parts'][:6])}" for h in ps['hotspots'][:3])
-        rec = (f"re-place before finishing: {remaining} item(s) left on the best candidate ({best['backend']}), "
+        rec = (f"re-place before finishing: even the closest candidate ({best['backend']}) has {remaining} item(s) left, "
                f"{round(100 * hot_share)}% of them in congested cells"
                + (f"; {len(hot_agree)} region(s) where {need}+ of {len(routed)} routers fail in a hotspot, around {', '.join(parts[:12])}" if hot_agree else '')
                + (f". Placement hotspots: {hs}" if hs else '')

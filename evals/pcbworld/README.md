@@ -79,7 +79,22 @@ python3 evals/pcbworld/run_d3.py --summarize d3a-v1               # rebuild a su
 
 `d3.json` is vendored from PCBWorld (BSD-3-Clause, `LICENSE.PCBWorld`), commit `b3d62f5`.
 
-## Results
+## Results (2026-10-04)
 
-See `results/`. Each run's `summary.md` has the method table, the paper's Table 3 for the same
-split, which backend produced each clean board, the placement-score AUCs, and a per-board table.
+| split (test) | best of our backends | Freerouting 2.2.4 | srj (capacity autorouter) | designer's routing | paper: Freerouting 2.1.0 · KRT · PPO · GPT-5.4 agent |
+|---|---|---|---|---|---|
+| D3-A, 99 small | **0.78** CP, Rout. 1.00 | 0.75 | 0.22 | 1.00 | 0.80 · 0.74 · 0.86 · 0.65 |
+| D3-B, 10 medium | **0.70**, Rout. 1.00 | 0.70 | 0.00 | 1.00 | 0.78 · 0.20 · 0.45 · 0.00 |
+| D3-C, 10 large | **0.20**, Rout. 1.00 | 0.20 | 0.00 | 0.90 | not reported |
+
+- `results/d3a-v2`, `d3b-v2`, `d3c-v2` are the runs above.
+- `results/d3a-v1` is the first run, kept as a record. It found three harness bugs, all fixed since:
+  - Freerouting 2.2.4 splits file paths on spaces, so 5 boards never routed.
+  - srj narrowed traces below each board's minimum width.
+  - Round board outlines were misread.
+- Freerouting is fab-clean but stops short. On every board no backend finished, Freerouting's candidate was 1–5 open nets from done, with zero DRC errors. srj connects everything but leaves clearance and short violations.
+- D3-C board `0599_RGBMatrixPanelCPLD…` is incomplete as designed: its own routing leaves 88 connections open. It's in the set because PCBWorld's DRC filter ignores unconnected items.
+- The placement score barely predicts which designer-placed boards a router finishes. AUC is 0.48–0.66 on D3-A, with ratsnest crossings the best signal. On D3-B and D3-C there are too few boards to say.
+- **The calibration finding.** The first version of the hand-finish-or-re-place rule said "re-place" on 23 boards whose designers routed them cleanly with the same placement.
+  - The rule now judges the candidate closest to done, and a hotspot is a warning, not a veto.
+  - All 33 unfinished boards (22 on D3-A, 3 on D3-B, 8 on D3-C) now read "hand-finish", 1–5 items. Re-judge any stored run with `--rediagnose <run>`.

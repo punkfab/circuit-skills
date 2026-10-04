@@ -13,8 +13,9 @@ Backends (default: every one available here):
 
 A project directory (index.circuit.tsx + node_modules) runs the full route4.sh pipeline per backend
 in its own copy of the project (node_modules linked, this skill's scripts), so planes, fab rules and
-the gates are applied identically; the project itself is not touched. A bare .kicad_pcb can only use
-srj and current. Each candidate is scored with KiCad DRC (the project's rules, JLCPCB if none),
+the gates are applied identically; the project itself is not touched. A bare .kicad_pcb (any KiCad
+board, e.g. the PCBWorld benchmark in evals/pcbworld) can use srj, current, and freerouting/fastroute
+through KiCad's own Specctra export and import (route_kicad_dsn.py); tscircuit needs the project. Each candidate is scored with KiCad DRC (the project's rules, JLCPCB if none),
 dfm_check, check_floating, critical routing when a policy exists, and routing metrics, then ranked:
 
   shorts+crossings, open nets, DFM actionable, floating pads, size violations (track width, via,
@@ -155,10 +156,15 @@ def route_project(project, backend, work, seconds):
 
 
 def route_board(board, backend, work, seconds):
-    _, _, opt = backend.partition(':')
+    name, _, opt = backend.partition(':')
     out = work / f'{backend.replace(":", "-")}.kicad_pcb'
-    code, secs = run(['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)],
-                     work, work / f'{backend.replace(":", "-")}.log', timeout=seconds + 300)
+    if name in ('freerouting', 'fastroute'):
+        # KiCad's own Specctra export/import: works on any KiCad board, not just tscircuit DSNs.
+        py = os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3')
+        cmd = [py, str(HERE / 'route_kicad_dsn.py'), str(board), '-o', str(out), '--backend', name, '--time', str(seconds)]
+    else:
+        cmd = ['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)]
+    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', timeout=seconds + 300)
     pro = board.with_suffix('.kicad_pro')
     if pro.exists() and out.exists():
         shutil.copy(pro, out.with_suffix('.kicad_pro'))
@@ -196,10 +202,14 @@ def defect_points(drc_json):
 def diagnose(run_dir, results, board, hand_max=10, region_mm=3.0):
     """Placement score + where each candidate fails -> a recommendation.
 
-    Two signals decide it. (1) Agreement: regions where most routers fail point at the placement;
-    routers failing in different places is router luck. (2) Congestion: defects in the placement's
-    hot cells (top decile of RUDY) point at the placement too. A best candidate with few defects
-    outside both is worth finishing by hand."""
+    The candidate judged is the one CLOSEST TO DONE (fewest remaining items), not the top-ranked one:
+    a router that leaves 2 open nets and nothing else is a 2-item hand-finish even when another
+    router connected everything with 40 clearance hits. Within --hand-max items it is a hand-finish.
+    Beyond that, two signals point at the placement: (1) agreement, regions where most routers fail
+    (different places is router luck), and (2) congestion, defects in the placement's hot cells.
+    Calibrated on PCBWorld D3 (evals/pcbworld): all 23 boards no router finished had a candidate
+    1-5 items from done, and their designers routed every one cleanly with the same placement, so
+    a hotspot alone never vetoes a short hand-finish; it is reported as a warning."""
     sys.path.insert(0, str(HERE))
     import placement_score
     ps = placement_score.score(str(board))
@@ -229,28 +239,31 @@ def diagnose(run_dir, results, board, hand_max=10, region_mm=3.0):
             agree.append({'at': [x0, y0, x0 + region_mm, y0 + region_mm], 'routers': len(who), 'hot': util(x0 + region_mm / 2, y0 + region_mm / 2) >= hot or any(util(x0 + a, y0 + b) >= hot for a in (0.5, 1.5, 2.5) for b in (0.5, 1.5, 2.5)), 'parts': parts})
     agree.sort(key=lambda a: (-a['routers'], -a['hot']))
 
-    best = next((r for r in sorted(routed, key=lambda r: rank_key(r['score']))), None)
+    def items(sc):
+        return sc['shorts'] + sc['unconnected'] + sc['dfm_actionable'] + sc['floating'] + sc['size_violations'] + sc['clearance']
+
+    best = min(routed, key=lambda r: (items(r['score']), rank_key(r['score'])), default=None)
     out = {'placement': {k: ps[k] for k in ('congestion', 'ratsnest', 'escape', 'hotspots', 'routing_layers', 'plane_nets')},
            'agreement_regions': agree, 'hand_max': hand_max}
     if not best:
         out['recommendation'] = 're-place: no router produced a candidate'
         return out
-    b = best['score']
+    remaining = items(best['score'])
     pts = per.get(best['backend'], [])
     in_hot = sum(1 for _, x, y in pts if util(x, y) >= hot)
-    blocking = b['shorts'] + b['unconnected'] + b['dfm_actionable'] + b['floating'] + b['size_violations']
-    remaining = blocking + b['clearance']
     hot_share = in_hot / len(pts) if pts else 0.0
     hot_agree = [a for a in agree if a['hot']]
     out.update(best=best['backend'], remaining=remaining, defects_in_hot_cells=round(hot_share, 2))
     if remaining == 0:
         rec = f"order-ready candidate: {best['backend']} passes every gate; review it and run check_board before ordering"
-    elif remaining <= hand_max and not (hot_agree and hot_share >= 0.5):
-        rec = f"hand-finish {best['backend']}: {remaining} item(s), {round(100 * hot_share)}% in congested cells, no placement hotspot that most routers fail in"
+    elif remaining <= hand_max:
+        warn = (f"; watch {', '.join(sorted({p for a in hot_agree[:3] for p in a['parts']})[:8])}, where {need}+ routers fail in a hotspot"
+                if hot_agree and hot_share >= 0.5 else '')
+        rec = f"hand-finish {best['backend']}: {remaining} item(s) left, {round(100 * hot_share)}% in congested cells{warn}"
     else:
         parts = sorted({p for a in (hot_agree or agree)[:4] for p in a['parts']})
         hs = '; '.join(f"{', '.join(h['parts'][:6])}" for h in ps['hotspots'][:3])
-        rec = (f"re-place before finishing: {remaining} item(s) left on the best candidate ({best['backend']}), "
+        rec = (f"re-place before finishing: even the closest candidate ({best['backend']}) has {remaining} item(s) left, "
                f"{round(100 * hot_share)}% of them in congested cells"
                + (f"; {len(hot_agree)} region(s) where {need}+ of {len(routed)} routers fail in a hotspot, around {', '.join(parts[:12])}" if hot_agree else '')
                + (f". Placement hotspots: {hs}" if hs else '')
@@ -302,10 +315,11 @@ def main():
         p.error(f'no board at {board}')
     backends = a.backends.split(',') if a.backends else available()
     if not is_project:
-        dropped = [b for b in backends if b.split(':')[0] not in ('srj', 'current')]
+        bare = ('srj', 'current', 'freerouting', 'fastroute')
+        dropped = [b for b in backends if b.split(':')[0] not in bare]
         if dropped:
-            print(f'(a bare board can only use srj and current; skipping {", ".join(dropped)})')
-        backends = [b for b in backends if b.split(':')[0] in ('srj', 'current')]
+            print(f'(a bare board cannot use {", ".join(dropped)}: it needs the tscircuit project; skipping)')
+        backends = [b for b in backends if b.split(':')[0] in bare]
 
     run_id = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     evals = project / 'route-evals'

@@ -85,3 +85,25 @@ test("stripRouting drops top-level tracks and vias only", () => {
   assert.match(out, /\(zone \(net 1\)/);
   assert.match(out, /\(pad "1" thru_hole/);
 });
+
+test("a round board's bounds are its circle, not the circle's center and rim point", () => {
+  const round = BOARD.replace('(gr_rect (start 0 0) (end 40 30) (layer "Edge.Cuts"))', '(gr_circle (center 20 15) (end 35 15) (layer "Edge.Cuts"))');
+  assert.deepEqual(boardToSrj(round, { layers: "auto" }).srj.bounds, { minX: 5, maxX: 35, minY: -30, maxY: 0 });
+});
+
+test("rules: the board's own minimum track width floors neck-down, and net classes set per-net widths", async () => {
+  const { mkdtempSync, writeFileSync } = await import("node:fs");
+  const dir = mkdtempSync("/tmp/route_srj_test-");
+  writeFileSync(`${dir}/b.kicad_pro`, JSON.stringify({
+    board: { design_settings: { rules: { min_track_width: 0.254 } } },
+    net_settings: { classes: [{ name: "Default", track_width: 0.254, clearance: 0.2 }, { name: "Power", track_width: 0.8 }],
+      netclass_patterns: [{ pattern: "GND", netclass: "Power" }] },
+  }));
+  const r = readRules(`${dir}/b.kicad_pcb`);
+  assert.equal(r.minTrace, 0.254);
+  assert.equal(r.netWidth("GND"), 0.8);
+  assert.equal(r.netWidth("SIG"), undefined);
+  const conns = Object.fromEntries(boardToSrj(BOARD, { layers: "auto", rules: r }).srj.connections.map((c) => [c.name, c]));
+  assert.equal(conns.GND.nominalTraceWidth, 0.8);
+  assert.equal(conns.SIG.nominalTraceWidth, undefined);
+});

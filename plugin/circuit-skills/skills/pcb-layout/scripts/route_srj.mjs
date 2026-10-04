@@ -64,20 +64,35 @@ const rot = (x, y, deg) => { const t = (deg * Math.PI) / 180, c = Math.cos(t), s
 export function readRules(boardPath, flags = {}) {
   const r = { trace: 0.2, minTrace: 0.15, clearance: 0.15, via: 0.6, drill: 0.3 };
   const pro = boardPath.replace(/\.kicad_pcb$/, ".kicad_pro");
+  let floor = { track: 0, clearance: 0 };
+  const netWidths = []; // [RegExp, width]: net-class track widths by the project's netclass_patterns
   try {
-    const cls = JSON.parse(readFileSync(pro, "utf8")).net_settings?.classes?.find((c) => c.name === "Default");
+    const project = JSON.parse(readFileSync(pro, "utf8"));
+    const classes = project.net_settings?.classes ?? [];
+    const cls = classes.find((c) => c.name === "Default");
     if (cls) {
       if (cls.track_width) r.trace = cls.track_width;
       if (cls.clearance) r.clearance = cls.clearance;
       if (cls.via_diameter) r.via = cls.via_diameter;
       if (cls.via_drill) r.drill = cls.via_drill;
     }
+    const rules = project.board?.design_settings?.rules ?? {};
+    floor = { track: rules.min_track_width ?? 0, clearance: rules.min_clearance ?? 0 };
+    const width = Object.fromEntries(classes.map((c) => [c.name, c.track_width]));
+    for (const { pattern, netclass } of project.net_settings?.netclass_patterns ?? []) {
+      if (!width[netclass]) continue;
+      const glob = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
+      netWidths.push([new RegExp(`^${glob}$`), width[netclass]]);
+    }
   } catch { /* no project file: JLCPCB defaults */ }
   for (const k of Object.keys(r)) if (flags[k] !== undefined) r[k] = flags[k];
-  r.clearance = Math.max(r.clearance, 0.127);
+  r.clearance = Math.max(r.clearance, 0.127, floor.clearance);
   r.drill = Math.max(r.drill, 0.3);
   r.via = Math.max(r.via, 0.6, r.drill + 0.26);
-  r.minTrace = Math.min(r.minTrace, r.trace);
+  // Never neck down below the board's own minimum track width (its DRC flags anything thinner).
+  r.minTrace = Math.max(Math.min(r.minTrace, r.trace), flags.minTrace ?? floor.track);
+  r.trace = Math.max(r.trace, r.minTrace);
+  r.netWidth = (name) => { const hit = netWidths.find(([re]) => re.test(name)); return hit ? Math.max(hit[1], r.minTrace) : undefined; };
   return r;
 }
 
@@ -145,11 +160,19 @@ export function boardToSrj(text, opts = {}) {
   // Board-level drilled holes (mounting holes drawn as gr_circle on Edge.Cuts are outline, not obstacles).
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const g of root.filter((e) => Array.isArray(e) && String(e[0]).startsWith("gr_") && str(kid(e, "layer")) === "Edge.Cuts")) {
+    if (g[0] === "gr_circle" && kid(g, "center") && kid(g, "end")) { // a round board: center +- radius
+      const c = kid(g, "center"), e = kid(g, "end"), r = Math.hypot(num(e, 1) - num(c, 1), num(e, 2) - num(c, 2));
+      x0 = Math.min(x0, num(c, 1) - r); x1 = Math.max(x1, num(c, 1) + r); y0 = Math.min(y0, num(c, 2) - r); y1 = Math.max(y1, num(c, 2) + r);
+      continue;
+    }
     for (const k of ["start", "end", "mid", "center"]) { const p = kid(g, k); if (p) { x0 = Math.min(x0, num(p, 1)); x1 = Math.max(x1, num(p, 1)); y0 = Math.min(y0, num(p, 2)); y1 = Math.max(y1, num(p, 2)); } }
     for (const xy of kids(kid(g, "pts") ?? [], "xy")) { x0 = Math.min(x0, num(xy, 1)); x1 = Math.max(x1, num(xy, 1)); y0 = Math.min(y0, num(xy, 2)); y1 = Math.max(y1, num(xy, 2)); }
   }
   if (!Number.isFinite(x0)) throw new Error("no Edge.Cuts outline");
-  const connections = [...byNet].filter(([, p]) => p.length >= 2).map(([name, pointsToConnect]) => ({ name, pointsToConnect }));
+  const connections = [...byNet].filter(([, p]) => p.length >= 2).map(([name, pointsToConnect]) => {
+    const w = r.netWidth?.(name); // the net's own class width (wider power nets), when it differs
+    return w && Math.abs(w - r.trace) > 1e-6 ? { name, pointsToConnect, nominalTraceWidth: w } : { name, pointsToConnect };
+  });
   const used = mode === "outer" ? obstacles.map((o) => ({ ...o, layers: o.layers.filter((l) => routable.includes(l)) })).filter((o) => o.layers.length) : obstacles;
   return {
     mode,

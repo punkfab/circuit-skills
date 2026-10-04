@@ -984,21 +984,46 @@ python3 scripts/route_eval.py route-evals/<run> --analyze      # (also runs afte
 - It exposes the real trade: spreading parts lowers peak congestion but costs wire length (and crossings
   move); optimise the hotspots, not total length.
 
-**The decision** (`route_eval.py`, written to the run's `summary.md` and `results.json`):
+**The decision** (`route_eval.py`, written to the run's `summary.md` and `results.json`). It judges the
+candidate **closest to done** (fewest remaining items), not the top-ranked one:
 
-| Best candidate | Where the defects are | Recommendation |
-|---|---|---|
-| passes every gate | — | order-ready: review, `check_board`, order |
-| <= `--hand-max` (10) items | not mostly in hotspots where most routers fail | **hand-finish** the best candidate |
-| more, or concentrated | regions where >= half the routers fail, inside placement hotspots | **re-place** those parts (spread, rotate, move decoupling off the escape), re-run |
+| Closest candidate | Recommendation |
+|---|---|
+| passes every gate | order-ready: review, `check_board`, order |
+| <= `--hand-max` (10) items | **hand-finish** it; if its defects sit where most routers fail inside a hotspot, those parts are named as a warning |
+| more | **re-place**: name the hotspot / agreement-region parts (spread, rotate, move decoupling off the escape), re-run |
 
-The signal no single router gives: **agreement**. Routers failing in the *same* congested region means
-the placement is the problem; routers failing in *different* places is router luck, so finish the best
-one. einhander (2026-10-04): "re-place before finishing: 34 items left on srj:outer, 47% in congested
-cells; regions where 2+ of 4 routers fail in a hotspot around J1, R_CC1, R_CC2, U1", which is the
-same lesson the July session learned by hand (widening the QFN band took unrouted 12 -> 5).
-Thresholds (`--hand-max`, top-decile/top-3%) are first guesses from one board; tune them as
-`route-evals/history.jsonl` grows.
+**Calibrated on 119 real boards (PCBWorld D3, `evals/pcbworld/`), and the first version was wrong.** It
+judged the top-ranked candidate and let a hotspot veto a hand-finish, so it said "re-place" on 23 boards
+whose designers had routed them cleanly *with the same placement*. On every one, Freerouting had stopped
+1-5 open nets short with zero DRC errors, while srj had connected everything with dozens of clearance hits
+in the congested cells. Two lessons: (1) the useful question is "how close is the *nearest* candidate",
+because routers fail differently; (2) on real, designer-placed boards the placement score barely predicts
+which boards a router finishes (AUC 0.5-0.7 on D3-A; mostly the ratsnest crossings), so it locates trouble,
+it doesn't decide it. Re-place is for when *no* candidate gets within reach, as on our own generated
+placements (einhander's first QFN band: 12 unrouted). einhander today: "hand-finish freerouting: 2 items;
+watch J1, R_CC1, R_CC2, U1", which is how it was shipped. Thresholds are still first guesses; keep
+tuning them against `route-evals/history.jsonl` and the D3 runs.
+
+## Benchmark: PCBWorld D3 (`evals/pcbworld/run_d3.py`)
+
+[PCBWorld](https://github.com/LGAI-Research/PCBWorld) (LG AI Research, KDD 2026 workshop) strips the
+routing from 678 real PCBench boards and scores re-routes by KiCad DRC under each board's own rules;
+**clean pass (CP)** = fully connected and zero DRC errors. `run_d3.py` sends each board through
+`route_eval` (bare-board backends) and scores it the same way; see `evals/pcbworld/README.md` to build the
+set (stock KiCad 9 works). Results 2026-10-04, one run per backend (the paper keeps the best of five):
+
+| split (test) | circuit-skills best-of | Freerouting 2.2.4 | srj | paper: Freerouting 2.1.0 · PPO · GPT-5.4 agent |
+|---|---|---|---|---|
+| D3-A, 99 small | **0.78** | 0.75 | 0.22 | 0.80 · 0.86 · 0.65 |
+| D3-B, 10 medium | **0.70** | 0.70 | 0.00 | 0.78 · 0.45 · 0.00 |
+| D3-C, 10 large | **0.20** | 0.20 | 0.00 | not reported |
+
+Every board no router finished was within 1-5 items of done (Freerouting's open nets). The benchmark also
+found three harness bugs before any of this was publishable: Freerouting 2.2.4 splits its file arguments
+on spaces (route in a space-free temp dir), srj necked traces below each board's own `min_track_width` and
+ignored net-class widths (now floored, and per-net `nominalTraceWidth`), and round `gr_circle` outlines
+were read as two corners.
 
 ## Critical routing coverage before release
 

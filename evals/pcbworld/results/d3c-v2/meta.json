@@ -1,0 +1,11 @@
+{
+ "run": "d3c-v2",
+ "split": "d3c",
+ "backends": "freerouting,srj:outer,srj:all",
+ "time": 300,
+ "data": "/home/dan/.cache/circuit-skills/pcbworld/pcbench/exacad_sorted",
+ "versions": {
+  "circuit_skills": "8c6d487",
+  "capacity_autorouter": "0.0.958"
+ }
+}

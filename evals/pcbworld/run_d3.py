@@ -221,8 +221,19 @@ def main():
     p.add_argument('--data', type=Path, default=DATA)
     p.add_argument('--run', help='run name (default <split>-<timestamp>); an existing run resumes')
     p.add_argument('--summarize', metavar='RUN', help='only rebuild summary.md for an existing run')
+    p.add_argument('--rediagnose', metavar='RUN', help="re-run route_eval's diagnosis on a stored run, then summarize")
     a = p.parse_args()
 
+    if a.rediagnose:  # re-judge stored runs with the current diagnosis, no routing
+        out = HERE / 'results' / a.rediagnose
+        rows = [json.loads(l) for l in (out / 'per_board.jsonl').read_text().splitlines() if l.strip()]
+        for r in rows:
+            runs = sorted((CACHE / 'runs' / a.rediagnose / r['board'] / 'route-evals').glob('2*/results.json'))
+            if runs:
+                res = json.loads(runs[-1].read_text())
+                r['diagnosis'] = route_eval.diagnose(runs[-1].parent, res['results'], res['board'])['recommendation']
+        (out / 'per_board.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in rows))
+        a.summarize = a.rediagnose
     if a.summarize:
         out = HERE / 'results' / a.summarize
         meta = json.loads((out / 'meta.json').read_text())

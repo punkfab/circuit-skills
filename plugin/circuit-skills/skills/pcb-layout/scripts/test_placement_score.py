@@ -90,6 +90,15 @@ class Diagnosis(unittest.TestCase):
             self.assertTrue(d['recommendation'].startswith('re-place'), d['recommendation'])
             self.assertIn('U1', d['recommendation'])
 
+    def test_the_candidate_closest_to_done_decides_not_the_top_ranked_one(self):
+        # srj-like: everything connected but 18 clearance hits in the hotspot; freerouting-like: 2 open, nothing else.
+        hot = [(15 + dx, 15 + dy) for dx in (-1, 0, 1) for dy in (-2, 2)] * 3
+        with tempfile.TemporaryDirectory() as tmp:
+            b, res = self.run_dir(tmp, {'a': hot, 'b': hot, 'c': [(15, 13), (15, 17)]},
+                                  {'a': self.sc(18), 'b': self.sc(18), 'c': self.sc(0, unconnected=2)})
+            d = route_eval.diagnose(tmp, res, b)
+            self.assertTrue(d['recommendation'].startswith('hand-finish c: 2 item'), d['recommendation'])
+
     def test_clean_best_candidate(self):
         with tempfile.TemporaryDirectory() as tmp:
             b, res = self.run_dir(tmp, {'a': []}, {'a': self.sc(0)})

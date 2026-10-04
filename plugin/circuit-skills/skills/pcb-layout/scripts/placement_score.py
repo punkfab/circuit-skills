@@ -119,6 +119,11 @@ def read_board(text):
     x0 = y0 = math.inf; x1 = y1 = -math.inf
     for g in root:
         if isinstance(g, list) and str(g[0]).startswith('gr_') and (kid(g, 'layer') or [None, None])[1] == 'Edge.Cuts':
+            if g[0] == 'gr_circle' and kid(g, 'center') and kid(g, 'end'):  # a round board: center +- radius
+                c, e = kid(g, 'center'), kid(g, 'end')
+                r = math.dist((num(c, 1), num(c, 2)), (num(e, 1), num(e, 2)))
+                x0, x1, y0, y1 = min(x0, num(c, 1) - r), max(x1, num(c, 1) + r), min(y0, num(c, 2) - r), max(y1, num(c, 2) + r)
+                continue
             for k in ('start', 'end', 'mid', 'center'):
                 p = kid(g, k)
                 if p:
@@ -191,8 +196,10 @@ def score(board_path, cell=1.0, pin_weight=None):
     blocked = [[0.0] * nx for _ in range(ny)]
 
     def cells(ax, ay, bx, by):
-        i0, i1 = max(0, int((ax - x0) / cell)), min(nx - 1, int((bx - x0) / cell))
-        j0, j1 = max(0, int((ay - y0) / cell)), min(ny - 1, int((by - y0) / cell))
+        # Clamped both ways: a pad drawn outside the outline (seen on real boards) lands in the edge cell.
+        clamp = lambda v, n: min(n - 1, max(0, v))
+        i0, i1 = clamp(int((ax - x0) / cell), nx), clamp(int((bx - x0) / cell), nx)
+        j0, j1 = clamp(int((ay - y0) / cell), ny), clamp(int((by - y0) / cell), ny)
         return i0, i1, j0, j1
 
     # Pads take routing area: through-hole on every routing layer, SMD on one.
