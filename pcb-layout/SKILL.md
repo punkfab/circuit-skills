@@ -93,7 +93,9 @@ to the named net** — so they reconcile cleanly. On flexisette this turned 19 f
 
 1. **Ground/power pours** — `<copperpour connectsTo="net.GND" layer="bottom"/>` removes 60-70% of nets.
    Prefer **per-block** pours; a board-level pour can *fight* bottom-layer signals.
-2. **`autorouter="sequential-trace"`** on every board/subcircuit. The default **capacity-mesh fails at
+2. **`autorouter="sequential-trace"`** on every board/subcircuit (⚠ recent tscircuit disables it by default
+   and its default router now completes boards it used to fail; see "tscircuit's own autorouter").
+   In June 2026 (tscircuit 0.0.19xx) the default **capacity-mesh failed at
    any size** ("AD ran out of iterations", 0 traces) and can hang. sequential-trace is dumb but
    *predictable* — routes fast or fails fast, never spins.
 3. **Explicit `footprint` on EVERY part** incl. `<pinheader footprint="pinrow4">` and
@@ -853,6 +855,49 @@ Its `--export-only --work-dir build/native` produces a DSN usable by either back
 Native `pcbnew.ExportSpecctraDSN` and `ImportSpecctraSES` were verified with KiCad
 9.0.8; older-version failures described above remain version-specific fallbacks.
 Do not assume that every custom KiCad rule can be represented by DSN.
+
+### tscircuit's own autorouter (third backend)
+
+tscircuit keeps improving its router, so it is kept as an alternative to the DSN routers. It routes
+**the design itself** while it is evaluated (no DSN, no SES), so it has its own runner:
+
+```bash
+node scripts/route_tscircuit.mjs index.circuit.tsx -o build/tscircuit.kicad_pcb \
+  --preset auto_local [--effort 2x] [--board /abs/board.kicad_pcb]   # fresh output each run
+ROUTER=tscircuit TSCIRCUIT_AUTOROUTER=auto_local bash scripts/route4.sh  # in the pipeline
+```
+
+The runner never edits the design: it writes a temporary copy of the entry file beside it with the
+`<board autorouter>` (and `autorouterEffortLevel`) set, runs `tsci export -f kicad_pcb` on that copy,
+deletes it, and writes the same `<board>.routing.json` live status as `route_dsn.py` (backend
+`tscircuit:<preset>`). In `route4.sh` the routed export replaces the board; planes, fab rules and the
+gates then run as for any backend. The router is the **project's** tscircuit: which presets exist and
+how well they route depends on its version, so upgrade the project to try a newer one.
+
+Measured on einhander (same placement, tscircuit 0.0.2744 / capacity-autorouter 0.0.958, 2026-10-04):
+
+| | Freerouting 2.2.4 (route4 + dsn_split_sides) | tscircuit `auto_local` |
+|---|---|---|
+| Open / shorts / crossings | 2 / 0 / 0 | **0 / 0 / 0** |
+| Vias, track | 32, 1421 mm (signals on F/B only) | 113, 1347 mm (signals on all 4 layers) |
+| After JLC rules | drc_check blocks on the 2 open nets | 120 clearance + 152 hole_clearance; **dfm_check FAILS**: 113 vias at 0.2 mm drill (JLC min 0.3), 88 hole-spacing hits incl. duplicate stacked vias |
+| Time | ~30 s | ~16 s first run, ~5 s cached |
+
+`auto`, `auto_local` and `tscircuit_beta` gave identical boards (the same router in that version);
+`krt` failed ("GridRouter found no route for connection …") and `laser_prefab` ran out of iterations.
+So: tscircuit now **connects** a board Freerouting leaves two nets short on, but its vias ignore the
+board's `viaHoleDiameter`/`viaPadDiameter` and it routes signals through the plane layers. Treat it as
+a candidate like any other and let `check_board` (DFM especially) decide. drc_check still files
+`clearance`/`hole_clearance` under "global-fix" even after fab rules are applied; on a routed board
+with JLC rules in place, read them as real.
+
+**Upgrading tscircuit (2026-10):** `npm i tscircuit@latest @tscircuit/cli@latest` resolved
+`circuit-json` 0.0.489 (the CLI pins it exactly) while core needs 0.0.515
+(`Export named 'pcb_bus_routing_constraint_warning' not found`). Fix with
+`"overrides": { "circuit-json": "<the version tscircuit's own node_modules has>" }` in package.json.
+Recent tscircuit also **disables `sequential_trace` by default** (it needs
+`platformConfig.allowLegacyAutorouters`); the default router plus `<autoroutingphase />` / `<fanout />`
+is its replacement.
 
 ## Critical routing coverage before release
 

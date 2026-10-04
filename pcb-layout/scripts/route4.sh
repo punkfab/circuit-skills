@@ -13,6 +13,10 @@
 #              stitch any island, set JLCPCB fab rules, DRC.
 #
 # Needs: bun/tsci, freert224, kipy, KiCad api server (socket /tmp/kicad/api.sock).
+#
+# Router: ROUTER=freerouting (default) | fastroute (FASTROUTE_BIN=) | tscircuit. tscircuit routes the
+# design itself (route_tscircuit.mjs; TSCIRCUIT_AUTOROUTER=auto_local, TSCIRCUIT_EFFORT=2x): no DSN/SES,
+# the routed export replaces the board, then planes, fab rules and the gates as usual.
 set -eu
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.bun/bin:$PATH"
@@ -33,28 +37,39 @@ $TSCI export -f specctra-dsn "$SRC" -o "$DSN" 2>&1 | grep -iE 'exported|error:' 
 echo "[2/9] placement gate (parts inside outline)"
 node scripts/outline-check.mjs "$SRC" || { [ "${FORCE:-}" = 1 ] || { echo "fix placement"; exit 1; }; }
 
-echo "[3/9] DSN prep: strip wiring + inner layers -> (type power)"
-python3 scripts/dsn_4layer_planes.py "$DSN" --no-planes --relabel-power
-# tscircuit dedupes DSN images by footprint name -> a top-side part sharing a footprint with a
-# bottom-side one inherits mirrored B.Cu pins. Rebuild those from the (correct) KiCad pads.
-/usr/bin/python3 scripts/dsn_split_sides.py "$BOARD" "$DSN"
+if [ "${ROUTER:-freerouting}" = tscircuit ]; then
+  # tscircuit routes the design itself while it is evaluated: no DSN, no SES. The candidate
+  # replaces the plain export; planes, fab rules and the gates below apply as for any backend.
+  echo "[3-6/9] tscircuit autorouter (${TSCIRCUIT_AUTOROUTER:-auto_local}${TSCIRCUIT_EFFORT:+, effort $TSCIRCUIT_EFFORT})"
+  CAND="build/tscircuit-${TSCIRCUIT_AUTOROUTER:-auto_local}-$(date +%Y%m%d-%H%M%S).kicad_pcb"
+  node scripts/route_tscircuit.mjs "$SRC" -o "$CAND" --preset "${TSCIRCUIT_AUTOROUTER:-auto_local}" \
+    ${TSCIRCUIT_EFFORT:+--effort "$TSCIRCUIT_EFFORT"} --board "$BOARD" --max-time "${MAXT:-900}" || exit 1
+  cp "$CAND" "$BOARD"
+else
+  echo "[3/9] DSN prep: strip wiring + inner layers -> (type power)"
+  python3 scripts/dsn_4layer_planes.py "$DSN" --no-planes --relabel-power
+  # tscircuit dedupes DSN images by footprint name -> a top-side part sharing a footprint with a
+  # bottom-side one inherits mirrored B.Cu pins. Rebuild those from the (correct) KiCad pads.
+  /usr/bin/python3 scripts/dsn_split_sides.py "$BOARD" "$DSN"
 
-echo "[4/9] DSN: keep GND/V3V3 routed (Freerouting places the QFN dogbones); planes poured in KiCad"
-# NOTE: fully dropping GND/V3V3 (dsn_drop_nets) leaves fine-pitch QFN power pins stranded — they
-# need routed dogbone escapes only the autorouter places well, and Freerouting's (plane) mode won't
-# fan them out (leaves ~48 unrouted). So we let it route them and pour the planes in KiCad.
-# (The "dense LDO corner" shorts that fix_ldo_planes.py used to hand-patch were really the
-# mixed-side image bug that dsn_split_sides.py now fixes above. See the pcb-layout skill.)
+  echo "[4/9] DSN: keep GND/V3V3 routed (Freerouting places the QFN dogbones); planes poured in KiCad"
+  # NOTE: fully dropping GND/V3V3 (dsn_drop_nets) leaves fine-pitch QFN power pins stranded — they
+  # need routed dogbone escapes only the autorouter places well, and Freerouting's (plane) mode won't
+  # fan them out (leaves ~48 unrouted). So we let it route them and pour the planes in KiCad.
+  # (The "dense LDO corner" shorts that fix_ldo_planes.py used to hand-patch were really the
+  # mixed-side image bug that dsn_split_sides.py now fixes above. See the pcb-layout skill.)
 
-echo "[5/9] DSN: keepout interior cutouts + NPTH mechanical holes"
-python3 scripts/add_cutout_keepouts.py "$BOARD" "$DSN" --margin 0.3 || echo "  (no interior Edge.Cuts cutouts)"
-python3 scripts/add_npth_keepouts.py  "$BOARD" "$DSN" --margin 0.3 --min-hole 0.5
+  echo "[5/9] DSN: keepout interior cutouts + NPTH mechanical holes"
+  python3 scripts/add_cutout_keepouts.py "$BOARD" "$DSN" --margin 0.3 || echo "  (no interior Edge.Cuts cutouts)"
+  python3 scripts/add_npth_keepouts.py  "$BOARD" "$DSN" --margin 0.3 --min-hole 0.5
 
-echo "[6/9] Freerouting v2.2.4 (signals + VBUS; planes & holes avoided)"
-rm -f "$SES"
-FREERT="${FREERT:-$HOME/.local/bin/freert224}" python3 scripts/route_dsn.py "$DSN" -o "$SES" --backend "${ROUTER:-freerouting}" --board "$BOARD" --max-time "${MAXT:-120}" --max-passes "${MP:-12}"
-[ -s "$SES" ] || { echo "no SES written"; exit 1; }
-echo "      SES: $(grep -c '(wire' "$SES") wires, $(grep -c '(via' "$SES") vias"
+  echo "[6/9] Freerouting v2.2.4 (signals + VBUS; planes & holes avoided)"
+  rm -f "$SES"
+  FREERT="${FREERT:-$HOME/.local/bin/freert224}" python3 scripts/route_dsn.py "$DSN" -o "$SES" --backend "${ROUTER:-freerouting}" --board "$BOARD" --max-time "${MAXT:-120}" --max-passes "${MP:-12}"
+  [ -s "$SES" ] || { echo "no SES written"; exit 1; }
+  echo "      SES: $(grep -c '(wire' "$SES") wires, $(grep -c '(via' "$SES") vias"
+
+fi
 
 echo "[7/9] launch pcbnew, wait for IPC socket"
 pkill -f 'pcbnew index' 2>/dev/null || true
@@ -71,7 +86,7 @@ done
 echo "[8/9] pour inner planes (In1=GND, In2=V3V3) + inject routed signals/power"
 python3 scripts/add_plane.py GND  In1.Cu --replace              2>&1 | tail -1
 python3 scripts/add_plane.py V3V3 In2.Cu --replace --priority 1 2>&1 | tail -1
-python3 scripts/apply_ses_ipc.py "$SES" --save --clear          2>&1 | tail -2
+[ "${ROUTER:-freerouting}" = tscircuit ] || python3 scripts/apply_ses_ipc.py "$SES" --save --clear 2>&1 | tail -2
 
 echo "[9/9] fab rules + verify"
 python3 scripts/apply_fab_rules.py "$PRO" --fab jlcpcb          2>&1 | tail -1
