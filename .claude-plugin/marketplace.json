@@ -1,0 +1,13 @@
+{
+  "name": "circuit-skills",
+  "owner": { "name": "punkfab", "url": "https://punkfab.com" },
+  "metadata": { "description": "Code-driven PCB design for Claude Code: the circuit viewer mod." },
+  "plugins": [
+    {
+      "name": "circuit-viewer",
+      "source": "./claude/circuit-viewer",
+      "description": "A live pane with the routed KiCad board and its DRC markers, the pcb-layout gates, and open_board / check_board / get_netlist tools.",
+      "homepage": "https://github.com/punkfab/circuit-skills"
+    }
+  ]
+}

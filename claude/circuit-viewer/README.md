@@ -27,6 +27,18 @@ built on the same backend ([`../../mcp`](../../mcp)).
 Needs Node.js 18+, KiCad 9+ (`kicad-cli` on PATH), Python 3 (the gates), and the netlist needs tscircuit
 installed in the project (`npm install` there). Nothing to build.
 
+From the plugin marketplace (terminal or the desktop app's Code tab):
+
+```
+/plugin marketplace add punkfab/circuit-skills
+/plugin install circuit-viewer@circuit-skills
+```
+
+In the desktop app's plugin browser, add `punkfab/circuit-skills` as a marketplace, then install
+**circuit-viewer** from it. A local checkout works as a marketplace too: add its folder path instead.
+
+Or load it straight from a checkout:
+
 ```sh
 # one session
 claude --plugin-dir /path/to/circuit-skills/claude/circuit-viewer
