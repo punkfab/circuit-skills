@@ -157,16 +157,51 @@ export function boardToSrj(text, opts = {}) {
       byNet.set(named, list);
     }
   }
-  // Board-level drilled holes (mounting holes drawn as gr_circle on Edge.Cuts are outline, not obstacles).
-  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  // Edge.Cuts: closed shapes (circle, rect, poly, and chains of lines/arcs). The largest is the board
+  // outline; every other one is a cutout (tape window, reel hole, slot), blocked on all layers.
+  const shapes = [], lines = [];
   for (const g of root.filter((e) => Array.isArray(e) && String(e[0]).startsWith("gr_") && str(kid(e, "layer")) === "Edge.Cuts")) {
-    if (g[0] === "gr_circle" && kid(g, "center") && kid(g, "end")) { // a round board: center +- radius
-      const c = kid(g, "center"), e = kid(g, "end"), r = Math.hypot(num(e, 1) - num(c, 1), num(e, 2) - num(c, 2));
-      x0 = Math.min(x0, num(c, 1) - r); x1 = Math.max(x1, num(c, 1) + r); y0 = Math.min(y0, num(c, 2) - r); y1 = Math.max(y1, num(c, 2) + r);
-      continue;
+    const P = (k) => { const p = kid(g, k); return p ? [num(p, 1), num(p, 2)] : null; };
+    if (g[0] === "gr_circle" && P("center") && P("end")) {
+      const c = P("center"), e = P("end"), rad = Math.hypot(e[0] - c[0], e[1] - c[1]);
+      shapes.push(Array.from({ length: 24 }, (_, i) => [c[0] + rad * Math.cos((i * Math.PI) / 12), c[1] + rad * Math.sin((i * Math.PI) / 12)]));
+    } else if (g[0] === "gr_rect" && P("start") && P("end")) {
+      const a = P("start"), e = P("end");
+      shapes.push([[a[0], a[1]], [e[0], a[1]], [e[0], e[1]], [a[0], e[1]]]);
+    } else if (g[0] === "gr_poly") {
+      shapes.push(kids(kid(g, "pts") ?? [], "xy").map((xy) => [num(xy, 1), num(xy, 2)]));
+    } else if (P("start") && P("end")) {
+      lines.push([P("start"), ...(P("mid") ? [P("mid")] : []), P("end")]);
     }
-    for (const k of ["start", "end", "mid", "center"]) { const p = kid(g, k); if (p) { x0 = Math.min(x0, num(p, 1)); x1 = Math.max(x1, num(p, 1)); y0 = Math.min(y0, num(p, 2)); y1 = Math.max(y1, num(p, 2)); } }
-    for (const xy of kids(kid(g, "pts") ?? [], "xy")) { x0 = Math.min(x0, num(xy, 1)); x1 = Math.max(x1, num(xy, 1)); y0 = Math.min(y0, num(xy, 2)); y1 = Math.max(y1, num(xy, 2)); }
+  }
+  const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.01;
+  while (lines.length) { // chain segments end to end into loops
+    const loop = [...lines.pop()];
+    for (let grew = true; grew && !near(loop[0], loop[loop.length - 1]);) {
+      grew = false;
+      for (let i = 0; i < lines.length; i++) {
+        const seg = lines[i], tail = loop[loop.length - 1];
+        const fwd = near(seg[0], tail), rev = near(seg[seg.length - 1], tail);
+        if (!fwd && !rev) continue;
+        loop.push(...(fwd ? seg : [...seg].reverse()).slice(1));
+        lines.splice(i, 1); grew = true; break;
+      }
+    }
+    if (near(loop[0], loop[loop.length - 1])) loop.pop();
+    shapes.push(loop);
+  }
+  const box = (pts) => ({ x0: Math.min(...pts.map((p) => p[0])), x1: Math.max(...pts.map((p) => p[0])), y0: Math.min(...pts.map((p) => p[1])), y1: Math.max(...pts.map((p) => p[1])) });
+  const area = (bb) => (bb.x1 - bb.x0) * (bb.y1 - bb.y0);
+  shapes.sort((a, b) => area(box(b)) - area(box(a)));
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, outline;
+  if (shapes.length) {
+    ({ x0, y0, x1, y1 } = box(shapes[0]));
+    const rectangular = shapes[0].length === 4 && shapes[0].every((p) => (near([p[0], 0], [x0, 0]) || near([p[0], 0], [x1, 0])) && (near([0, p[1]], [0, y0]) || near([0, p[1]], [0, y1])));
+    if (!rectangular) outline = shapes[0].map(([x, y]) => ({ x, y: 0 - y }));
+    shapes.slice(1).forEach((pts, i) => {
+      const bb = box(pts);
+      obstacles.push({ type: "rect", layers: all, center: { x: (bb.x0 + bb.x1) / 2, y: 0 - (bb.y0 + bb.y1) / 2 }, width: bb.x1 - bb.x0, height: bb.y1 - bb.y0, connectedTo: [], obstacleId: `cutout.${i + 1}` });
+    });
   }
   if (!Number.isFinite(x0)) throw new Error("no Edge.Cuts outline");
   const connections = [...byNet].filter(([, p]) => p.length >= 2).map(([name, pointsToConnect]) => {
@@ -178,6 +213,7 @@ export function boardToSrj(text, opts = {}) {
     mode,
     srj: {
       layerCount: routable.length,
+      ...(outline ? { outline } : {}),
       minTraceWidth: r.minTrace, nominalTraceWidth: r.trace,
       minViaHoleDiameter: r.drill, minViaPadDiameter: r.via, minViaDiameter: r.via,
       defaultObstacleMargin: r.clearance, minTraceToPadEdgeClearance: r.clearance, minTraceToHoleEdgeClearance: Math.max(r.clearance, 0.25),

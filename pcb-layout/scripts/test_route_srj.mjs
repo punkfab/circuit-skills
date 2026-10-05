@@ -107,3 +107,22 @@ test("rules: the board's own minimum track width floors neck-down, and net class
   assert.equal(conns.GND.nominalTraceWidth, 0.8);
   assert.equal(conns.SIG.nominalTraceWidth, undefined);
 });
+
+test("a shaped outline becomes the router's outline polygon, and interior cutouts become obstacles", () => {
+  // An L-shaped board drawn as six chained lines (two of them reversed), with a round hole and a rect window.
+  const edges = [[0, 0, 40, 0], [40, 0, 40, 15], [20, 15, 40, 15], [20, 15, 20, 30], [20, 30, 0, 30], [0, 30, 0, 0]]
+    .map(([a, b, c, d]) => `(gr_line (start ${a} ${b}) (end ${c} ${d}) (layer "Edge.Cuts"))`).join("\n  ");
+  const shaped = BOARD.replace('(gr_rect (start 0 0) (end 40 30) (layer "Edge.Cuts"))',
+    `${edges}\n  (gr_circle (center 5 25) (end 7 25) (layer "Edge.Cuts"))\n  (gr_rect (start 30 3) (end 36 7) (layer "Edge.Cuts"))`);
+  const { srj } = boardToSrj(shaped, { layers: "auto" });
+  assert.deepEqual(srj.bounds, { minX: 0, maxX: 40, minY: -30, maxY: 0 });
+  assert.equal(srj.outline.length, 6);
+  assert.ok(srj.outline.some((p) => p.x === 20 && p.y === -15)); // the inside corner of the L
+  const cut = srj.obstacles.filter((o) => o.obstacleId.startsWith("cutout."));
+  assert.equal(cut.length, 2);
+  const hole = cut.find((o) => Math.abs(o.center.x - 5) < 1e-6);
+  assert.ok(Math.abs(hole.width - 4) < 1e-6 && Math.abs(hole.center.y + 25) < 1e-6);
+  assert.deepEqual(cut[0].connectedTo, []);
+  // A plain rectangle stays bounds-only.
+  assert.equal(boardToSrj(BOARD, { layers: "auto" }).srj.outline, undefined);
+});

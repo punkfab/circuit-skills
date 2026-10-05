@@ -11,10 +11,12 @@ ImportSpecctraSES, refill zones, save <out> with the board's .kicad_pro beside i
 <out>.ses next to the output. Needs the pcbnew module (the system /usr/bin/python3 of a KiCad 9 install).
 Exit 0 when a routed board was written, 1 when the router saved no session, 2 on bad input.
 
-Known limit: KiCad's exporter refuses some boards (it returns False with no reason given headless,
-e.g. the tscircuit einhander board); those exit 2 and route_eval records the backend as failed.
+KiCad's exporter returns False, with no reason given headless, for a board that has a footprint with an
+empty reference; tscircuit exports bare holes and vias that way, so they are named NOREFn for the round
+trip and blanked again. Pour zones go out as planes and Edge.Cuts cutouts as keepouts. A board KiCad
+still refuses exits 2 and route_eval records the backend as failed.
 """
-import argparse, os, shutil, subprocess, sys, tempfile
+import argparse, json, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -45,6 +47,27 @@ def strip_routing(text):
     return ''.join(out)
 
 
+def grow_keepouts(dsn_text, margin_um):
+    """Push every (keepout (polygon ...)) vertex away from the polygon's centroid by margin_um.
+    KiCad exports Edge.Cuts cutouts as bare keepouts, so a router keeps only track clearance from a
+    slot or window, not the fab's copper-to-edge clearance. Exact for circles, near enough for
+    convex cutouts (windows, slots)."""
+    import re
+
+    def grow(m):
+        nums = [float(v) for v in m.group(3).split()]
+        pts = list(zip(nums[0::2], nums[1::2]))
+        ring = pts[:-1] if len(pts) > 1 and pts[0] == pts[-1] else pts  # closed polygons repeat the first vertex
+        cx, cy = sum(x for x, _ in ring) / len(ring), sum(y for _, y in ring) / len(ring)
+        out = []
+        for x, y in pts:
+            d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5 or 1.0
+            out.append(f'{x + (x - cx) / d * margin_um:.1f} {y + (y - cy) / d * margin_um:.1f}')
+        return f'{m.group(1)}{m.group(2)}  {"  ".join(out)}'
+
+    return re.sub(r'(\(keepout "[^"]*" \(polygon )(\S+ \S+)\s+([-\d.\s]+?)(?=\))', grow, dsn_text)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('board', type=Path)
@@ -71,9 +94,22 @@ def main():
         if src.with_suffix('.kicad_pro').exists():  # the DSN's clearances and widths come from the project's net classes
             shutil.copy(src.with_suffix('.kicad_pro'), load.with_suffix('.kicad_pro'))
     board = pcbnew.LoadBoard(str(load))
+    # KiCad's exporter refuses a board with an empty footprint reference (it returns False, silently,
+    # headless). tscircuit exports bare holes and vias that way, so name them for the round trip.
+    unnamed = [f for f in board.GetFootprints() if not f.GetReference()]
+    for i, f in enumerate(unnamed):
+        f.SetReference(f'NOREF{i + 1}')
     if not pcbnew.ExportSpecctraDSN(board, str(dsn)) or not dsn.exists():
         print(f'route_kicad_dsn: KiCad refused to export {src.name} as DSN', file=sys.stderr)
         return 2
+
+    # Cutout keepouts get the copper-to-edge clearance (project rule, 0.3 mm when there is none).
+    edge = 0.3
+    try:
+        edge = json.loads(load.with_suffix('.kicad_pro').read_text())['board']['design_settings']['rules'].get('min_copper_edge_clearance', edge)
+    except (OSError, ValueError, KeyError):
+        pass
+    dsn.write_text(grow_keepouts(dsn.read_text(), (edge + 0.05) * 1000))
 
     env = dict(os.environ)
     if a.backend == 'freerouting' and not env.get('FREERT'):
@@ -94,6 +130,8 @@ def main():
     if not pcbnew.ImportSpecctraSES(board, str(ses)):
         print(f'route_kicad_dsn: KiCad could not import {ses}', file=sys.stderr)
         return 1
+    for f in unnamed:
+        f.SetReference('')
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     pcbnew.SaveBoard(str(out), board)
     pro = src.with_suffix('.kicad_pro')

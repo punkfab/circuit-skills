@@ -961,6 +961,38 @@ No candidate was clean: the winner is a better *starting point* for the finishin
 finished board. The ranking puts open nets ahead of fab issues on purpose (an open net is a dead
 board); read the whole table, not just row 1.
 
+## 2-layer boards, headless: `scripts/route2.sh`
+
+For a 2-layer board with a ground pour, route **from the placed KiCad board**, not from tscircuit's DSN:
+
+```bash
+bash scripts/route2.sh        # export -> outline gate -> merge_nets -> prep_board -> route_eval --apply -> drc_check
+BACKENDS=freerouting,srj:all MAXT=120 POUR="GND:B.Cu" bash scripts/route2.sh
+```
+
+- `prep_board.py` strips tscircuit's routing, adds the pour zone(s) (tscircuit's `<copperpour>` does not
+  export), writes the `.kicad_pro` with the fab's rules, and fills. Pours connect **SMD pads solidly,
+  thermals on through-hole only**, so a cap under a module cannot end up with a starved thermal.
+- `route_eval` then runs Freerouting through KiCad's own Specctra export/import (`route_kicad_dsn.py`)
+  and the capacity autorouter, scores both, and applies the candidate **closest to done**.
+- No live KiCad, no IPC, and no second copy of the placement: the DSN is exported from the board being
+  routed, so a moved part can never be routed at its old coordinates.
+
+Three traps this path had, all handled in the scripts:
+- **KiCad's `ExportSpecctraDSN` returns False, silently, when any footprint has an empty reference.**
+  tscircuit exports bare holes and vias that way, so `route_kicad_dsn.py` names them `NOREFn` for the
+  round trip. (This, not a KiCad bug, is why the SWIG export "never worked" on tscircuit boards.)
+- **Cutouts go out as bare keepouts**, so a router keeps only track clearance from a window or slot.
+  `grow_keepouts` pushes them out by the project's copper-to-edge clearance.
+- **`route_srj` used the outline's bounding box.** It now passes the real outline polygon and adds every
+  interior Edge.Cuts shape (window, reel hole, slot) as an obstacle.
+
+flexisette re-run (2026-10-04, `flexisette/pcb-rerun`): the shipped June board had 10 open connections
+and 5 DRC errors after days of work; this path gave 0 open / 0 errors in 6 s of routing, with three
+placement changes made in source, each pointed at by the leftover items: a button pad 0.455 mm from an
+edge, a bottom-side decap boxed in against the board edge (moved 2 mm inboard), and a charger cap 5 mm
+from its pin (placed by pin with `Decap`). **Read each leftover item as a placement question first.**
+
 ## Is this placement routable? Hand-finish or re-place?
 
 Placement decides routing difficulty, so score the placement itself, before any router runs:

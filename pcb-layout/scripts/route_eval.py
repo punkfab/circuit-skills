@@ -373,6 +373,12 @@ def main():
             diag = diagnose(work, ranked, board, a.hand_max)
             write_diagnosis(work, diag)
             print(f"\n{diag['recommendation']}")
+            # The candidate to keep is the one closest to done, which the diagnosis names; the table
+            # order (open nets before clearance) can put a messier fully-connected board first.
+            closest = next((r for r in ranked if r['backend'] == diag.get('best')), None)
+            if closest and best and closest is not best and best['backend'] != 'current':
+                print(f"(closest to done: {closest['backend']}, not the top-ranked {best['backend']})")
+                best = closest
         except Exception as e:  # the ranking stands without the diagnosis
             print(f'\n(diagnosis skipped: {e})')
     if best:
