@@ -73,8 +73,13 @@ def place(variant, src, out, work):
         shutil.copy(src, out)
     elif variant.startswith('swap'):
         subprocess.run([py, '-c', SWAP, str(src), str(out), str(int(variant[4:]) / 100), '1'], capture_output=True, timeout=300)
-    elif variant == 'pk':
-        subprocess.run([py, str(SCRIPTS / 'place_kicad.py'), str(src), '-o', str(out)], capture_output=True, timeout=900)
+    elif variant in ('pk', 'pk2'):
+        subprocess.run([py, str(SCRIPTS / 'place_kicad.py'), str(src), '-o', str(out)], capture_output=True, timeout=1800)
+    elif variant in ('h1', 'h2', 'h3'):  # hints derived from the designer's placement, at three levels of detail
+        hints = work / f'{variant}.hints'
+        hints.write_text(subprocess.run([py, str(SCRIPTS / 'place_hints.py'), 'derive', str(src), '--level', variant[1]], capture_output=True, text=True, timeout=300).stdout)
+        r = subprocess.run([py, str(SCRIPTS / 'place_kicad.py'), str(src), '-o', str(out), '--hints', str(hints)], capture_output=True, text=True, timeout=1800)
+        (work / f'{variant}.place.log').write_text(r.stdout + r.stderr)
     elif variant == 'tm':
         pile = work / 'pile.kicad_pcb'
         subprocess.run([py, str(HERE.parent / 'pcbworld' / 'unplace.py'), str(src), '-o', str(pile), '--pile', 'centre'], capture_output=True, timeout=300)
@@ -103,6 +108,7 @@ def run_board(b, a):
             if not place(v, bare, placed, work):
                 rows.append({**row, 'failed': 'no placement'})
                 continue
+            subprocess.run(['/usr/bin/python3', str(SCRIPTS / 'zone_fill.py'), str(placed), '--unfill'], capture_output=True, timeout=300)
             row['placement_drv'], u0 = drc(placed)
             t0 = time.time()
             subprocess.run(['tracemaker', 'route', str(placed), '-o', str(routed), '--time', str(a.time), '--threads', '4', '--no-kb'], capture_output=True, timeout=a.time * 4 + 120)
@@ -123,6 +129,8 @@ def run_board(b, a):
 
 def route(a):
     boards = [b for b in json.loads((HERE / 'manifest.json').read_text())['boards'] if b['bare_drv'] == 0 and b['connections'] <= a.max_connections]
+    global ROWS
+    ROWS = HERE / a.rows
     done = {json.loads(l)['board'] for l in ROWS.read_text().splitlines()} if ROWS.exists() else set()
     todo = [b for b in boards if b['id'] not in done][:a.limit]
     print(f'{len(todo)} of {len(boards)} boards to run', flush=True)
@@ -142,6 +150,7 @@ def main():
     p.add_argument('--time', type=int, default=20)
     p.add_argument('--jobs', type=int, default=3)
     p.add_argument('--max-connections', type=int, default=150)
+    p.add_argument('--rows', default='score_study.jsonl', help='results file under evals/corpus')
     p.add_argument('--variants', type=lambda s: s.split(','), default=VARIANTS)
     a = p.parse_args()
     if a.step == 'route':
