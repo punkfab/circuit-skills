@@ -1,0 +1,9 @@
+{
+ "run": "d3b-v3~tracemaker-place",
+ "base": "d3b-v3",
+ "name": "tracemaker-place",
+ "cmd": "tracemaker-place {in} -o {out} --mode full --threads 8",
+ "pile": "centre",
+ "backends": "tracemaker,freerouting:2.1.0,srj:all",
+ "time": 60
+}

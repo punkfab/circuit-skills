@@ -1,0 +1,11 @@
+{
+ "run": "d3a-v3",
+ "split": "d3a",
+ "backends": "freerouting,freerouting:2.1.0,tracemaker,srj:outer,srj:all",
+ "time": 60,
+ "data": "/home/dan/.cache/circuit-skills/pcbworld/pcbench/exacad_sorted",
+ "versions": {
+  "circuit_skills": "20d783e",
+  "capacity_autorouter": "0.0.958"
+ }
+}

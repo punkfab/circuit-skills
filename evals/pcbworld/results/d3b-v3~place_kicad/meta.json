@@ -1,0 +1,9 @@
+{
+ "run": "d3b-v3~place_kicad",
+ "base": "d3b-v3",
+ "name": "place_kicad",
+ "cmd": "/usr/bin/python3 ~/sandbox/punkfab/circuit-skills/pcb-layout/scripts/place_kicad.py {in} -o {out}",
+ "pile": "beside",
+ "backends": "tracemaker,freerouting:2.1.0,srj:all",
+ "time": 60
+}

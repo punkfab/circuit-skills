@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Local Freerouting/FastRoute DSN→SES, bounded runtime and live viewer status."""
-import argparse, json, os, re, shutil, subprocess, time
+import argparse, json, os, re, shutil, signal, subprocess, time
 from pathlib import Path
 
 def command(backend, executable, dsn, ses, passes, seconds, report, min_width=None):
@@ -48,20 +48,20 @@ def main():
     publish('running','routing candidate; KiCad verification pending')
     try:
         with log.open('w') as out:
-            proc=subprocess.Popen(command(a.backend,exe,dsn,ses,a.max_passes,a.max_time,report,a.min_trace_width_um),stdout=out,stderr=subprocess.STDOUT,env=env)
+            proc=subprocess.Popen(command(a.backend,exe,dsn,ses,a.max_passes,a.max_time,report,a.min_trace_width_um),stdout=out,stderr=subprocess.STDOUT,env=env,start_new_session=True)  # own process group: a launcher script's java child dies with it
             try:
                 while proc.poll() is None:
                     if time.monotonic()-started>a.max_time+10:
-                        proc.terminate()
+                        os.killpg(proc.pid,signal.SIGTERM)
                         try: proc.wait(timeout=5)
-                        except subprocess.TimeoutExpired: proc.kill(); proc.wait()
+                        except subprocess.TimeoutExpired: os.killpg(proc.pid,signal.SIGKILL); proc.wait()
                         break
                     time.sleep(1); publish('running',f'{int(time.monotonic()-started)}s elapsed; KiCad verification pending')
             finally:
                 if proc.poll() is None:
-                    proc.terminate()
+                    os.killpg(proc.pid,signal.SIGTERM)
                     try: proc.wait(timeout=5)
-                    except subprocess.TimeoutExpired: proc.kill(); proc.wait()
+                    except subprocess.TimeoutExpired: os.killpg(proc.pid,signal.SIGKILL); proc.wait()
         if ses.is_file() and ses.stat().st_size:
             if a.backend=='freerouting': ses.write_text(ses.read_text().replace('(host_version )','(host_version "freerouting")'))
             publish('candidate',f'SES saved (exit {proc.returncode}); import, refill zones and run KiCad DRC'); return 0

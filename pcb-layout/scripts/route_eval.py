@@ -5,7 +5,11 @@ way, rank them, and keep the results so approaches can be compared run after run
   python3 route_eval.py <project dir | board.kicad_pcb> [--backends LIST] [--time S] [--apply]
 
 Backends (default: every one available here):
-  freerouting           route4.sh with Freerouting (needs freert224 / FREERT)
+  freerouting[:VER]     route4.sh with Freerouting (needs freert224 / FREERT). A version picks another
+                        launcher: freerouting:2.1.0 runs FREERT_210, else ~/.local/bin/freert210, else
+                        ~/.local/bin/freert. 2.1.0 keeps optimizing where 2.2.4 stops early.
+  tracemaker            TraceMaker (github.com/DingoOz/TraceMaker; needs TRACEMAKER_BIN or tracemaker
+                        on PATH): routes the KiCad board directly, no DSN. Bare boards only.
   fastroute             route4.sh with FastRoute (needs FASTROUTE_BIN)
   tscircuit[:PRESET]    route4.sh with the design's own tscircuit router (default preset auto_local)
   srj[:all|outer|auto]  route_srj.mjs: tscircuit's capacity autorouter on the KiCad board itself
@@ -14,7 +18,7 @@ Backends (default: every one available here):
 A project directory (index.circuit.tsx + node_modules) runs the full route4.sh pipeline per backend
 in its own copy of the project (node_modules linked, this skill's scripts), so planes, fab rules and
 the gates are applied identically; the project itself is not touched. A bare .kicad_pcb (any KiCad
-board, e.g. the PCBWorld benchmark in evals/pcbworld) can use srj, current, and freerouting/fastroute
+board, e.g. the PCBWorld benchmark in evals/pcbworld) can use srj, current, tracemaker, and freerouting/fastroute
 through KiCad's own Specctra export and import (route_kicad_dsn.py); tscircuit needs the project. Each candidate is scored with KiCad DRC (the project's rules, JLCPCB if none),
 dfm_check, check_floating, critical routing when a policy exists, and routing metrics, then ranked:
 
@@ -40,10 +44,25 @@ def which(cmd):
     return shutil.which(cmd) is not None
 
 
+def freert(version):
+    """Launcher for a named Freerouting version: FREERT_<digits>, ~/.local/bin/freert<digits>, then (2.1.0) freert."""
+    tag = re.sub(r'\D', '', version)
+    cands = [os.getenv(f'FREERT_{tag}'), Path.home() / f'.local/bin/freert{tag}'] + ([Path.home() / '.local/bin/freert'] if tag == '210' else [])
+    return next((str(c) for c in cands if c and Path(c).exists()), None)
+
+
+def tracemaker_bin():
+    return os.getenv('TRACEMAKER_BIN') or shutil.which('tracemaker')
+
+
 def available():
     found = ['current']
     if os.getenv('FREERT') or Path.home().joinpath('.local/bin/freert224').exists():
         found.append('freerouting')
+    if freert('2.1.0'):
+        found.append('freerouting:2.1.0')
+    if tracemaker_bin():
+        found.append('tracemaker')
     if os.getenv('FASTROUTE_BIN') or which('fastroute'):
         found.append('fastroute')
     found.append('tscircuit:auto_local')
@@ -151,6 +170,8 @@ def route_project(project, backend, work, seconds):
         env.update(ROUTER='srj', SRJ_LAYERS=opt or 'auto')
     else:
         env.update(ROUTER=name)
+        if name == 'freerouting' and opt:
+            env.update(FREERT=freert(opt) or f'no-freerouting-{opt}-launcher')
     code, secs = run(['bash', 'scripts/route4.sh'], copy, work / f'{backend.replace(":", "-")}.log', env, timeout=seconds * 3 + 300)
     return copy / 'index.circuit.kicad_pcb', code, secs
 
@@ -158,13 +179,28 @@ def route_project(project, backend, work, seconds):
 def route_board(board, backend, work, seconds):
     name, _, opt = backend.partition(':')
     out = work / f'{backend.replace(":", "-")}.kicad_pcb'
-    if name in ('freerouting', 'fastroute'):
+    env = None
+    if name == 'tracemaker':
+        # Reads and writes the KiCad board itself; it routes what is unrouted, so strip first.
+        sys.path.insert(0, str(HERE))
+        from route_kicad_dsn import strip_routing
+        bare = work / 'tracemaker.unrouted.kicad_pcb'
+        bare.write_text(strip_routing(board.read_text()))
+        if board.with_suffix('.kicad_pro').exists():
+            shutil.copy(board.with_suffix('.kicad_pro'), bare.with_suffix('.kicad_pro'))
+        cmd = [tracemaker_bin() or 'tracemaker', 'route', str(bare), '-o', str(out), '--time', str(seconds),
+               '--threads', os.getenv('TRACEMAKER_THREADS', '8'), '--no-kb']
+    elif name in ('freerouting', 'fastroute'):
         # KiCad's own Specctra export/import: works on any KiCad board, not just tscircuit DSNs.
         py = os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3')
         cmd = [py, str(HERE / 'route_kicad_dsn.py'), str(board), '-o', str(out), '--backend', name, '--time', str(seconds)]
+        if name == 'freerouting' and opt:
+            env = {'FREERT': freert(opt) or f'no-freerouting-{opt}-launcher'}
     else:
         cmd = ['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)]
-    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', timeout=seconds + 300)
+    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', env, timeout=seconds + 300)
+    if name == 'tracemaker' and out.exists():
+        code = 0  # it exits non-zero when connections are left open; the board it wrote is still a candidate
     pro = board.with_suffix('.kicad_pro')
     if pro.exists() and out.exists():
         shutil.copy(pro, out.with_suffix('.kicad_pro'))
@@ -314,8 +350,11 @@ def main():
     if not board.exists():
         p.error(f'no board at {board}')
     backends = a.backends.split(',') if a.backends else available()
+    if is_project and any(b == 'tracemaker' for b in backends):
+        print('(tracemaker routes a bare .kicad_pcb, not the project pipeline; skipping)')
+        backends = [b for b in backends if b != 'tracemaker']
     if not is_project:
-        bare = ('srj', 'current', 'freerouting', 'fastroute')
+        bare = ('srj', 'current', 'freerouting', 'fastroute', 'tracemaker')
         dropped = [b for b in backends if b.split(':')[0] not in bare]
         if dropped:
             print(f'(a bare board cannot use {", ".join(dropped)}: it needs the tscircuit project; skipping)')

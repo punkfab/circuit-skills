@@ -1,0 +1,14 @@
+{
+ "run": "d3a-v2+tracemaker",
+ "split": "d3a",
+ "backends": "freerouting,srj:outer,srj:all",
+ "time": 60,
+ "data": "/home/dan/.cache/circuit-skills/pcbworld/pcbench/exacad_sorted",
+ "versions": {
+  "circuit_skills": "8c6d487",
+  "capacity_autorouter": "0.0.958"
+ },
+ "external": {
+  "tracemaker": "/tmp/claude-1000/-home-dan-sandbox-punkfab-circuit-skills/37493db6-f08b-4e05-9f06-8838e0807725/scratchpad/TraceMaker/build/gpu/src/app/tracemaker route {in} -o {out} --time 60 --threads 8 --no-kb"
+ }
+}

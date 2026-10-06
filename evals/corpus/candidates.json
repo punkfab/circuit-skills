@@ -1,0 +1,2963 @@
+[
+ {
+  "repo": "kitspace/awesome-electronics",
+  "stars": 8188,
+  "licence": "CC0-1.0",
+  "branch": "master",
+  "description": "A curated list of awesome resources for Electronic Engineers and hobbyists"
+ },
+ {
+  "repo": "openscopeproject/InteractiveHtmlBom",
+  "stars": 4590,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Interactive HTML BOM generation plugin for KiCad, EasyEDA, Eagle, Fusion360 and Allegro PCB designer"
+ },
+ {
+  "repo": "byrantech/laptop",
+  "stars": 4259,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "anyon_e, a highly integrated, high end, open source laptop. Attempt the impossible."
+ },
+ {
+  "repo": "KiCad/kicad-source-mirror",
+  "stars": 3008,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "This is an active mirror of the KiCad development branch, which is hosted at GitLab (updated every time something is pushed). Pull requests on GitHub are not accepted or watched."
+ },
+ {
+  "repo": "but0n/Avem",
+  "stars": 2915,
+  "licence": "MIT",
+  "branch": "develop",
+  "description": "\ud83d\ude81 \u8f7b\u91cf\u7ea7\u65e0\u4eba\u673a\u98de\u63a7-[Drone]-[STM32]-[PID]-[BLDC]"
+ },
+ {
+  "repo": "tscircuit/tscircuit",
+  "stars": 2796,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Create real electronics with Typescript and React"
+ },
+ {
+  "repo": "Bouni/kicad-jlcpcb-tools",
+  "stars": 2094,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Plugin to generate BOM + CPL files for JLCPCB, assigning LCSC part numbers directly from the plugin, query the JLCPCB parts database, lookup datasheets and much more."
+ },
+ {
+  "repo": "freerouting/freerouting",
+  "stars": 2062,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Advanced PCB auto-router"
+ },
+ {
+  "repo": "yaqwsx/KiKit",
+  "stars": 2037,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Automation tools for KiCAD"
+ },
+ {
+  "repo": "stack-chan/stack-chan",
+  "stars": 1748,
+  "licence": "Apache-2.0",
+  "branch": "develop",
+  "description": "A JavaScript-driven M5Stack-embedded super-kawaii robot."
+ },
+ {
+  "repo": "devbisme/skidl",
+  "stars": 1682,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "SKiDL is a library that lets you design electronic circuits using Python."
+ },
+ {
+  "repo": "yaqwsx/PcbDraw",
+  "stars": 1435,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Convert your KiCAD board into a nicely looking 2D drawing suitable for pinout diagrams"
+ },
+ {
+  "repo": "skot/bitaxe",
+  "stars": 1371,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "master",
+  "description": "Open source ASIC Bitcoin miner hardware"
+ },
+ {
+  "repo": "aklofas/kicad-happy",
+  "stars": 1334,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "AI coding agent skills for KiCad electronics design. Works with Claude Code and OpenAI Codex. Analyze schematics, review PCB layouts, EMC pre-compliance, SPICE simulation, download datasheets, source components, and prep boards for fabrication."
+ },
+ {
+  "repo": "autonomous-ai/openharness",
+  "stars": 1120,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "The ultimate harness for coding agents and beyond. All your agents. All your machines. One command center. Start with code, then follow your curiosity and build across disciplines: CAD, circuits, robots, games and music."
+ },
+ {
+  "repo": "delftopenhardware/awesome-open-hardware",
+  "stars": 1082,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "\ud83d\udee0Helpful items for making open source hardware projects."
+ },
+ {
+  "repo": "tzarc/keyboards",
+  "stars": 988,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "@tzarc's custom keyboard designs."
+ },
+ {
+  "repo": "badgeek/svg2shenzhen",
+  "stars": 873,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Convert Inkscape SVG drawings to KiCad PCB and footprint modules"
+ },
+ {
+  "repo": "beekeeb/piantor",
+  "stars": 867,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "The Piantor Keyboard is a beginner-friendly, easy-to-solder, 42-key or 36-key, diodeless, low profile aggressive column staggered, hotswappable and non-hotswappable, programmable ergonomic mechanical split keyboard powered by Raspberry Pi Pico or other compatible RP2040 boards. It is based on the Cantor Keyboard."
+ },
+ {
+  "repo": "easyw/RF-tools-KiCAD",
+  "stars": 831,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "KiCAD RF tools: footprints wizard and round tracks, mask expander, via fencing"
+ },
+ {
+  "repo": "gcormier/megadesk",
+  "stars": 818,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Open-source IKEA Bekant controller board"
+ },
+ {
+  "repo": "projf/projf-explore",
+  "stars": 791,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Project F brings FPGAs to life with exciting open-source designs you can build on."
+ },
+ {
+  "repo": "30350n/pcb2blender",
+  "stars": 788,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "KiCad to Blender 3D model workflow"
+ },
+ {
+  "repo": "Hanqaqa/Easyduino",
+  "stars": 749,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "master",
+  "description": "Easily dive into different PCB KiCad designs of the most popular microcontroller devboards"
+ },
+ {
+  "repo": "pointhi/kicad-color-schemes",
+  "stars": 718,
+  "licence": "CC0-1.0",
+  "branch": "master",
+  "description": "Want to change the color scheme of KiCad? Look here for Inspiration."
+ },
+ {
+  "repo": "leoheck/kiri",
+  "stars": 709,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Kiri is a visual tool designed for reviewing schematics and layouts of KiCad projects that are version-controlled with Git."
+ },
+ {
+  "repo": "bennymeg/Fabrication-Toolkit",
+  "stars": 689,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "An JLC PCB Fabrication Plugin for KiCad "
+ },
+ {
+  "repo": "Ottercast/OtterCastAudioV2",
+  "stars": 667,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "OtterCast is an open-source audio streaming device running Linux. Based on a Sochip S3 SoC, featuring a Webinterface, shairport-sync, snapcast, Spotify Connect and pulseaudio sink/source."
+ },
+ {
+  "repo": "hildogjr/KiCost",
+  "stars": 627,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Build cost spreadsheet for a KiCad project."
+ },
+ {
+  "repo": "joanbono/awesome-kicad",
+  "stars": 624,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A curated list of awesome KiCad plugins and resources"
+ },
+ {
+  "repo": "duckyb/urchin",
+  "stars": 596,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "34 key ZMK keyboard, nice!view, nice!nano & hotswap supported."
+ },
+ {
+  "repo": "CDFER/JLCPCB-Kicad-Library",
+  "stars": 588,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A set of symbols, footprints and 3d models of the basic components from JLCPCB's smt assembly"
+ },
+ {
+  "repo": "Robotips/uConfig",
+  "stars": 587,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Datasheet pinout extractor from PDF and library Stylizer for Kicad."
+ },
+ {
+  "repo": "iandchasse/silkscreen-pcb",
+  "stars": 564,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "master",
+  "description": "Silkscreen: open-hardware ESP32-S3 e-paper reader mainboard (KiCad 9). Formerly the de-link hub."
+ },
+ {
+  "repo": "antmicro/jetson-nano-baseboard",
+  "stars": 541,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Antmicro's open hardware baseboard for the NVIDIA Jetson Nano, TX2 NX and Xavier NX"
+ },
+ {
+  "repo": "adamws/kicad-kbplacer",
+  "stars": 540,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "KiCad plugin for automatic keyboard's key placement and routing"
+ },
+ {
+  "repo": "drandyhaas/KiCadRoutingTools",
+  "stars": 504,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A set of Python/Rust tools to aid routing in KiCad"
+ },
+ {
+  "repo": "yaqwsx/Pinion",
+  "stars": 504,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Generate interactive and nice-looking diagrams for your PCBs!"
+ },
+ {
+  "repo": "TousstNicolas/JLC2KiCad_lib",
+  "stars": 483,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "JLC2KICAD_lib is a python script that generate a component library (schematic, footprint and 3D model ) for KiCad from the JLCPCB/easyEDA library."
+ },
+ {
+  "repo": "raeedcho/temper",
+  "stars": 483,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "a wireless-only split keyboard based on the chocofi"
+ },
+ {
+  "repo": "Alarm-Siren/arduino-kicad-library",
+  "stars": 449,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "KiCad Symbol & Footprint Library for Arduino Modules (Shields, Sockets and Tiles)"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenRX",
+  "stars": 441,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "OpenRX open-source ExpressLRS receiver family hub; board sources live in four dedicated hardware repositories."
+ },
+ {
+  "repo": "kicad-spice-library/KiCad-Spice-Library",
+  "stars": 433,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Centralized repo to store KiCad/Spice modules for simulations"
+ },
+ {
+  "repo": "thpoll83/PolyKybd",
+  "stars": 406,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "master",
+  "description": "PolyKybd"
+ },
+ {
+  "repo": "Hanqaqa/PCB_Business_Card",
+  "stars": 405,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Elegant PCB Business Card made with Inkscape, Kicad and Svg2Shenzen."
+ },
+ {
+  "repo": "soundmonster/samoklava",
+  "stars": 389,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Generated keyboard"
+ },
+ {
+  "repo": "bbogush/nand_programmer",
+  "stars": 389,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "NANDO - NAND Open programmer"
+ },
+ {
+  "repo": "Gekkio/gb-hardware",
+  "stars": 377,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "Game Boy -related custom hardware by gekkio"
+ },
+ {
+  "repo": "OpenGammaProject/Open-Gamma-Detector",
+  "stars": 377,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "\u2622\ufe0f\ud83d\udc41\ufe0f Hardware for a hackable DIY gamma-ray spectrometer using a popular NaI(Tl) scintillator, SiPM and a Raspberry Pi Pico."
+ },
+ {
+  "repo": "kitspace/kicad_footprints",
+  "stars": 373,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A collection of all the KiCad footprints on the internet"
+ },
+ {
+  "repo": "zhiayang/mikoto",
+  "stars": 356,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Bluetooth LE nRF52840 microcontroller in a pro-micro footprint."
+ },
+ {
+  "repo": "matthewlai/JLCKicadTools",
+  "stars": 355,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Tool for using JLCPCB assembly service with KiCad"
+ },
+ {
+  "repo": "XenGi/teensy_library",
+  "stars": 328,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "KiCAD library for Teensy microcontrollers"
+ },
+ {
+  "repo": "copperheadhq/copperhead",
+  "stars": 324,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Hardware as fast as software."
+ },
+ {
+  "repo": "pashutk/Cherry_MX_ULP",
+  "stars": 318,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A comprehensive resource for Cherry MX Ultra Low Profile (ULP) switches and custom keyboard builds. Includes Kicad footprints, datasheets, keycap sources, project examples, and purchase links."
+ },
+ {
+  "repo": "jsreynaud/kicad-action-scripts",
+  "stars": 295,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Some KiCad plugins in Python"
+ },
+ {
+  "repo": "GuitarML/FunBox",
+  "stars": 281,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Stereo guitar pedal platform using Daisy Seed."
+ },
+ {
+  "repo": "circuit-synth/circuit-synth",
+  "stars": 278,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Better Boards, Faster!  Python-defined circuits with Claude Code as your intelligent design partner"
+ },
+ {
+  "repo": "justbuchanan/oasis",
+  "stars": 270,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "3d-printed smart terrarium"
+ },
+ {
+  "repo": "Steffen-W/Import-LIB-KiCad-Plugin",
+  "stars": 262,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Helps to import KiCad component libraries imported from ultralibrarian and snapeda zipfiles."
+ },
+ {
+  "repo": "newdigate/teensy-eurorack",
+  "stars": 258,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Hardware Design: Eurorack shield for teensy 4.1 with 14 in / 16 out analog channels"
+ },
+ {
+  "repo": "Miceuz/i2c-moisture-sensor",
+  "stars": 258,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "I2C based soil moisture sensor"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenESC-20x20",
+  "stars": 256,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source 4-in-1 AM32 ESC for FPV drones. 20x20 mm, 2-6S, one MCU per motor, CERN-OHL-S-2.0."
+ },
+ {
+  "repo": "mecparts/RetroWiFiModem",
+  "stars": 256,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "An ESP8266 based RS232 <-> WiFi modem with Hayes AT style commands and LED indicators"
+ },
+ {
+  "repo": "CRImier/MyKiCad",
+  "stars": 253,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "My KiCad boards. Can't be bothered uploading individually anymore, so here you go."
+ },
+ {
+  "repo": "sparkmicro/Ki-nTree",
+  "stars": 251,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Fast part creation for KiCad and InvenTree"
+ },
+ {
+  "repo": "AzonInc/Doorman",
+  "stars": 244,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "ESP32-S3 based Intercom Gateway (TCS / Koch / Niko / Scantron / Analogue Systems)"
+ },
+ {
+  "repo": "Open-Smartwatch/open-smartwatch-gps",
+  "stars": 242,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Hardware design files for the GPS version of the open-smartwatch"
+ },
+ {
+  "repo": "tjko/fanpico",
+  "stars": 238,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Fanpico: Open Source Programmable PWM (PC) Fan Controller"
+ },
+ {
+  "repo": "salitronic/eda-agent",
+  "stars": 237,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Open-source MCP server that lets an AI drive a live session of Altium Designer, and optionally KiCad or EasyEDA Pro, editing the open design in place while you watch. 300+ tools: schematic, PCB, library and project automation, design review, audits, rendering, auto-placement, panelization, autonomous design-plan executor. Apache-2.0."
+ },
+ {
+  "repo": "crides/kleeb",
+  "stars": 235,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Collection of Kicad 6.0 symbols, footprints and 3D models useful in keyboard creation"
+ },
+ {
+  "repo": "Jana-Marie/ligra",
+  "stars": 215,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "an open source image projector build from scratch and based off of flea market parts."
+ },
+ {
+  "repo": "nguyen-v/KDT_Hierarchical_KiBot",
+  "stars": 207,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Professional, automated workflow template for KiCad. This template uses KiBot in a CI/CD environment to automate fabrication and assembly document generation."
+ },
+ {
+  "repo": "alplabai/signex",
+  "stars": 199,
+  "licence": "Apache-2.0",
+  "branch": "trunk",
+  "description": "Open-source, AI-first EDA tool \u2014 GPL licenced or Industry Lead EDA tools compatible schematic and PCB editor built in Rust Language"
+ },
+ {
+  "repo": "jasonsbeer/Amiga-2000-EATX",
+  "stars": 198,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "An Amiga 2000 PCB in the EATX form factor."
+ },
+ {
+  "repo": "way2pramil/awesome-kicad-projects",
+  "stars": 195,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "\ud83d\udcd4 \ud83d\udcda A curated list of Project Made with Kicad."
+ },
+ {
+  "repo": "siderakb/pmw3360-pcb",
+  "stars": 194,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "PMW3360 optical mouse sensor breakout board, support both 3.3V and 1.8V logic"
+ },
+ {
+  "repo": "UzixLS/zx-sizif-512",
+  "stars": 194,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "ZX Spectrum CPLD-based clone for rubber case"
+ },
+ {
+  "repo": "ojg/thatmicpre",
+  "stars": 193,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "Microphone Pre-amplifier"
+ },
+ {
+  "repo": "murexrobotics/electrical",
+  "stars": 192,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Highly integrated electronics design and printed circuit boards (PCBs) for the MATE ROV Competition. Attempt the impossible."
+ },
+ {
+  "repo": "XenGi/teensy.pretty",
+  "stars": 190,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "KiCAD library for Teensy microcontrollers"
+ },
+ {
+  "repo": "duckyb/eternal-keypad",
+  "stars": 189,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A 36 key gaming keypad, for both right and left handed mouse users."
+ },
+ {
+  "repo": "ZSWatch/Watch-DevKit-HW",
+  "stars": 187,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "The hardware repo for the ZSWatch Development Kit."
+ },
+ {
+  "repo": "jkramarz/TheTick",
+  "stars": 183,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "The Tick is the next evolution in covert access control system implants for simulating adversary-in-the-middle attacks."
+ },
+ {
+  "repo": "xtoolbox/lckiconverter",
+  "stars": 170,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A browser extension to convert LCEDA.cn (aka easyeda.com) component to KiCad format"
+ },
+ {
+  "repo": "siderakb/ergo-snm-keyboard",
+  "stars": 170,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "ErgoSNM is a split ergonomic keyboard integrated with trackball, wireless is in beta"
+ },
+ {
+  "repo": "thomaslepoix/Qucs-RFlayout",
+  "stars": 169,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Export Qucs RF schematics to KiCad layouts & OpenEMS scripts"
+ },
+ {
+  "repo": "RespiraWorks/Ventilator",
+  "stars": 168,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Fully-featured ICU ventilator design, optimized for manufacture using commonly available components and free to license. Repository tracks all mechanical, electrical and systems design, software, requirements and regulatory documentation."
+ },
+ {
+  "repo": "Hydra-Designs/project-hydra-meshtastic-pcb",
+  "stars": 167,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A minimalist 1W LoRA PCB design for Meshtastic-device firmware"
+ },
+ {
+  "repo": "mzuelch/CATs-Eurosynth",
+  "stars": 165,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Analog Synth Eurorack Modules"
+ },
+ {
+  "repo": "strayer/taira-keyboard",
+  "stars": 161,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A wireless low-profile split mechanical keyboard with 66 keys inspired by the ErgoDash and Corne Chocolate"
+ },
+ {
+  "repo": "TimRudy/ice-chips-verilog",
+  "stars": 159,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "IceChips is a library of all common discrete logic devices in Verilog"
+ },
+ {
+  "repo": "almtzr/Pedro3DFiles",
+  "stars": 158,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Pedro the open source project designed with STEM spirit"
+ },
+ {
+  "repo": "LeoDJ/Paw-Connect",
+  "stars": 157,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "An alternative PCB pawprint for the Tag-Connect TC2030 pogo pin programming cable"
+ },
+ {
+  "repo": "Envious-Data/EnvOpenPico",
+  "stars": 151,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "An open source RP2040 MCU Board Family"
+ },
+ {
+  "repo": "JarrettR/Stretch",
+  "stars": 149,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "KiCad to SVG and then back again"
+ },
+ {
+  "repo": "mafe72/27c160-tl866-adapter",
+  "stars": 148,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Adapter to program EPROMs with more than 40 Pins on the TL866 universal programmer."
+ },
+ {
+  "repo": "kiisu-io/kiisu4",
+  "stars": 146,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Documentation, schematics, and 3D models for KIISU V4 \u2014 credit-card sized Flipper Zero compatible dev board"
+ },
+ {
+  "repo": "siderakb/key-switches.pretty",
+  "stars": 145,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Mechanical keyboard switches KiCad footprint library, including MX, Choc, LowProfile, HotSwap, THT..."
+ },
+ {
+  "repo": "dnlbauer/corax-keyboard",
+  "stars": 144,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A column-staggered wireless spilt keyboard with scrollwheels, thumb- and pinky cluster."
+ },
+ {
+  "repo": "Spaceboards/SpaceboardsHardware",
+  "stars": 144,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "master",
+  "description": "A collection of open source hardware that has been designed by Spaceboards"
+ },
+ {
+  "repo": "fxkuehl/mantis",
+  "stars": 144,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Mantis hex ergo keyboard"
+ },
+ {
+  "repo": "Jana-Marie/EF-S-Adapter",
+  "stars": 139,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Hard- and Firmware to control different EF and EF-S lenses"
+ },
+ {
+  "repo": "camrbuss/pinci",
+  "stars": 129,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Super thin split PCB keyboard using rp2040 chips running Rust"
+ },
+ {
+  "repo": "mvnmgrx/kiutils",
+  "stars": 129,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Simple and SCM-friendly KiCad file parser based on Python dataclasses for KiCad 6.0 and up."
+ },
+ {
+  "repo": "Shaurya-Sethi/circuitron",
+  "stars": 128,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Circuitron: Agentic PCB Design Accelerator \u2014 Generate, plan, and layout circuits from natural language prompts."
+ },
+ {
+  "repo": "OpenLightingProject/rp2040-dmxsun",
+  "stars": 128,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "RP2040-based USB DMX dongle with integrated web server"
+ },
+ {
+  "repo": "maxlab-io/tokay-lite-pcb",
+  "stars": 126,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Tokay AI Camera - ESP32 camera development board"
+ },
+ {
+  "repo": "siderakb/pmw3610-pcb",
+  "stars": 121,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "PMW3610 laser mouse sensor breakout board, support either 1.8V or 3.3V logic"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenFC-Lite-Mini",
+  "stars": 119,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source Betaflight flight controller. RP2354A, 20x20 mm, 6-layer, 3-6S, CERN-OHL-S-2.0."
+ },
+ {
+  "repo": "oaslananka/kicad-mcp-pro",
+  "stars": 117,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "MCP server for KiCad, connecting AI agents to schematic and PCB workflows, ERC/DRC validation, DFM checks, BOM analysis, and manufacturing preparation\u2014with controlled edits and human-gated release workflows."
+ },
+ {
+  "repo": "ChrisChrisLoLo/bancouver40",
+  "stars": 112,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A 4x10 CFX spaced low-profile mechanical keyboard."
+ },
+ {
+  "repo": "UzixLS/pc-kharon-386",
+  "stars": 112,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "Tiny IBM PC compatible machine with 386 CPU, integrated VGA and sound."
+ },
+ {
+  "repo": "ChrisChrisLoLo/banime40",
+  "stars": 111,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "A 4x10 hotswap ortholinear keyboard that supports multiple configurations."
+ },
+ {
+  "repo": "weirdgyn/viastitcher",
+  "stars": 110,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "ViaStitching action-plugin for KiCAD"
+ },
+ {
+  "repo": "Wakoma/nimble",
+  "stars": 109,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "master",
+  "description": "The nimble.  An open source, rapidly deployable, wireless mesh network. "
+ },
+ {
+  "repo": "zykrah/kicad-kle-placer",
+  "stars": 104,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "KiCAD plugin to help place switch footprints based on a KLE"
+ },
+ {
+  "repo": "TheusHen/EEGFrontier",
+  "stars": 104,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "EEGFrontier is an open-source EEG device designed to measure focus and attention during study using real brain signals. It uses a custom-built PCB with a professional EEG analog front-end to capture raw EEG data and stream it in real time to a computer via USB."
+ },
+ {
+  "repo": "qeda/qeda",
+  "stars": 103,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "The tool for easy creating electronic component libraries"
+ },
+ {
+  "repo": "Jana-Marie/anotter-sensor-hub",
+  "stars": 101,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Anotter OSHW environment sensor hub, focussed on Sensirion SEN055/SEN05x sensors, featuring a prometheus-exporter."
+ },
+ {
+  "repo": "Alarm-Siren/6502-kicad-library",
+  "stars": 99,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "KiCad Symbol Library for a variety of MOS, CBM and WDC retro microchips, including the eponymous MOS Technology 6502."
+ },
+ {
+  "repo": "projf/isle",
+  "stars": 96,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Isle FPGA Computer"
+ },
+ {
+  "repo": "crmaykish/mackerel-68k",
+  "stars": 95,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A series of single-board Motorola 68k computers with support for modern Linux"
+ },
+ {
+  "repo": "adamws/keyboard-tools",
+  "stars": 94,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Tools for mechanical keyboard design"
+ },
+ {
+  "repo": "ashpil/Model-M-Type-C",
+  "stars": 94,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A modern yet simple Model M replacement controller"
+ },
+ {
+  "repo": "uCAN-LIN/LinUSBConverter",
+  "stars": 92,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Open source USB \u2194 LIN bus dongle. LIN 2.1 master / slave / monitor, optically isolated, SLCAN compatible \u2014 no proprietary drivers."
+ },
+ {
+  "repo": "Huaqiu-Electronics/ecad-viewer",
+  "stars": 91,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "View Electronic Designs Online"
+ },
+ {
+  "repo": "EasyKiconverter/EasyKiConverter",
+  "stars": 90,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Qt 6/C++17 converter for LCSC and EasyEDA components to KiCad, Altium, and Xpedition libraries."
+ },
+ {
+  "repo": "jangtrinh/design-os-3d-blender",
+  "stars": 89,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "AI agent operating system for Blender 5.2: bpy knowledge base, AGENT_OK execution contract, 3D-print production gate, worked keyboard and desktop-robot builds."
+ },
+ {
+  "repo": "ZoidTechnology/PCIce",
+  "stars": 89,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A PCI Express card with an inbuilt PWM fan controller and mounting points for an 80mm fan."
+ },
+ {
+  "repo": "m1geo/Pi5_PCIe",
+  "stars": 87,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A crude reverse engineering of the Pi5 PCIe connector & potential breakout boards."
+ },
+ {
+  "repo": "Gekkio/gekkio-kicad-libs",
+  "stars": 87,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "KiCad 10.x libraries by gekkio"
+ },
+ {
+  "repo": "connornishijima/SensoryBridge",
+  "stars": 86,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "OSHW Advanced LED Audio Visualizer based around a hacky Discrete Fourier Transform"
+ },
+ {
+  "repo": "KOEGlike/meko",
+  "stars": 85,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A linux music player with ddr3, a 70hz e-paper display and a haptic touchpad"
+ },
+ {
+  "repo": "buganini/Kikakuka",
+  "stars": 78,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad Workspace / Panelizer / Build Variants / Differ / FreeCAD Bridge for PCB Bending & Assembly"
+ },
+ {
+  "repo": "dhaillant/kicad-3dmodels",
+  "stars": 76,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Home made open source STEP and VRML 3D Models for Kicad"
+ },
+ {
+  "repo": "tzarc/ghoul",
+  "stars": 75,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Ghoul Planck-like MicroMod keyboard"
+ },
+ {
+  "repo": "Miceuz/rs485-moist-sensor",
+  "stars": 74,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Digital (RS485 - based) soil moisture and temperature sensor "
+ },
+ {
+  "repo": "Jana-Marie/analog-toolkit",
+  "stars": 74,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "A smol and simple STM32G431 based Analog to USB toolkit."
+ },
+ {
+  "repo": "Pakequis/ProtoConn",
+  "stars": 70,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "A prototype board with connectors for electronic testing and development."
+ },
+ {
+  "repo": "leomanangka/esp32-4-channel-relays",
+  "stars": 70,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "PCB design four channel relays with ESP32-WROOM-32"
+ },
+ {
+  "repo": "parisxmas/fastroute",
+  "stars": 69,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Fast open-source PCB autorouter for KiCad and Specctra DSN \u2014 a Rust port of Freerouting with bug fixes, length matching, controlled impedance and differential pairs"
+ },
+ {
+  "repo": "transistorfet/computie",
+  "stars": 69,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A collection of 68k computer projects, including a unix-like operating system written in C that runs on them"
+ },
+ {
+  "repo": "MakersAsylumIndia/M19O2",
+  "stars": 68,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "M19O2 open source hardware Oxygen Concentrator based on the Pressure Swing Adsorption cycle aka Skarstorm cycle"
+ },
+ {
+  "repo": "Steffen-W/KiCad-Parasitics",
+  "stars": 68,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "KiCad plugin to determine the parasitic properties of the printed tracks in the PCB layout."
+ },
+ {
+  "repo": "Jana-Marie/OtterScreenAdapter",
+  "stars": 68,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "DisplayPort to Ipad 3/4 panel adapter"
+ },
+ {
+  "repo": "Projektanker/kicad-db-lib",
+  "stars": 67,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Inspired by Altium, KiCadDbLib creates one or more KiCad Symbol Libraries based on your database. Create and maintain a database for your electric components."
+ },
+ {
+  "repo": "nextjlc/openjlc",
+  "stars": 67,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "\u26a1 Ultra-fast Gerber conversion tool written in Rust."
+ },
+ {
+  "repo": "Allegra42/ZEReader-KiCad",
+  "stars": 67,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "ZEReader is an open source hardware and software E-Book Reader platform. Originally developed as a bachelor's thesis in electrical engineering, the project now evolves as a hobby initiative dedicated to further develop this hackable and customizable platform."
+ },
+ {
+  "repo": "instadeepai/deeppcb-kicad-plugin",
+  "stars": 66,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "DeepPCB routing plugin for KiCad"
+ },
+ {
+  "repo": "ravinrabbid/DonCon2040",
+  "stars": 65,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "RP2040 based firmware and hardware for DIY Taiko no Tatsujin Drum Controllers"
+ },
+ {
+  "repo": "siderakb/rp-micro",
+  "stars": 65,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Pro Micro/Elite-Pi compatible RP2040 board with USB-C, 8MB flash and up to 25 GPIOs"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenESC-30x30",
+  "stars": 65,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source 4-in-1 AM32 ESC for FPV drones. 30.5x30.5 mm, 2-8S, one MCU per motor, CERN-OHL-S-2.0."
+ },
+ {
+  "repo": "stonedDiscord/nonSNES",
+  "stars": 65,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Super Nintendo Entertainment System PAL schematic and board layout"
+ },
+ {
+  "repo": "brown-studios/minuet",
+  "stars": 65,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Minuet upgrades your MAXXAIR Maxxfan with a brushless DC motor, home automation features, and accessories."
+ },
+ {
+  "repo": "rschenk/re-gret",
+  "stars": 64,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "34 key choc hotswap keyboard, wireless"
+ },
+ {
+  "repo": "markh-de/KiVar",
+  "stars": 63,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "PCB Assembly Variants for KiCad"
+ },
+ {
+  "repo": "asukiaaa/gerber_to_order",
+  "stars": 63,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A KiCad plugin project to create gerber files and zip files."
+ },
+ {
+  "repo": "mecparts/PicoWiFiModem",
+  "stars": 61,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A Pico W based RS232 <-> WiFi modem with Hayes AT style commands and LED indicators"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenFC-Lite",
+  "stars": 60,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source Betaflight flight controller. RP2354B, 30.5x30.5 mm, 6-layer, 3-8S, CERN-OHL-S-2.0."
+ },
+ {
+  "repo": "tscircuit/core",
+  "stars": 59,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Create electronics with Typescript and React. Compile Typescript to Circuit JSON"
+ },
+ {
+  "repo": "aronreid/ups-to-esp32",
+  "stars": 59,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Put a USB-only UPS on the network: an ESP32-S3 board and firmware that serves NUT on TCP 3493, with a web UI. No host computer, no Raspberry Pi."
+ },
+ {
+  "repo": "30350n/free2ki",
+  "stars": 59,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "FreeCAD to KiCad 3D model exporter"
+ },
+ {
+  "repo": "tscircuit/tscircuit.com",
+  "stars": 58,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "The main website, playground and online development environment for tscircuit (React Electronics)"
+ },
+ {
+  "repo": "hulryung/kicad-lcsc-manager",
+  "stars": 58,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad plugin for importing LCSC/EasyEDA components with symbols, footprints, and 3D models directly into your projects"
+ },
+ {
+  "repo": "YC-Lam/IP5328P-powerbank_design",
+  "stars": 58,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "a USB power delivery powerbank pcb based on IP5328P chip, feel free to use it"
+ },
+ {
+  "repo": "Goga64/ULK",
+  "stars": 57,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Low profile split keyboard with Corne 42 Layout and Cerry ULP switches. (6mm height)"
+ },
+ {
+  "repo": "buildwithtrace/trace",
+  "stars": 57,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Official source code of Trace, an AI-native PCB design tool."
+ },
+ {
+  "repo": "ckflight/FMCW-RADAR",
+  "stars": 57,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Frequency Modulated Continuous Wave Radar hardware and software design files with 26 dBm output power covering around 250 m."
+ },
+ {
+  "repo": "vul-os/sirboard",
+  "stars": 55,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Open hardware: 107 KiCad PCB designs \u2014 SMD-to-THT breakout adapters, ATTiny/ATMega/ESP development boards, and a 39-part sensor line on a common JST-SH connector."
+ },
+ {
+  "repo": "TweetyDaBird/Little-Big-Scroll",
+  "stars": 55,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "A family of macropads featuring a large Encoder wheel and (1?)/4 or 6 keys."
+ },
+ {
+  "repo": "0xjmux/ESP-PROG-Adapter",
+  "stars": 55,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Adapter PCB and Kicad Library to make adding component-less program and debug footprints to your PCBs as easy as possible"
+ },
+ {
+  "repo": "Ladniy/jiran-ble-lite",
+  "stars": 54,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Wireless ergo-split keyboard, based on nRF52840 module."
+ },
+ {
+  "repo": "rniwase/sdtv2csi",
+  "stars": 54,
+  "licence": "CC0-1.0",
+  "branch": "master",
+  "description": "Board for converting SDTV analog video to MIPI CSI-2 using Analog Devices ADV7280A-M."
+ },
+ {
+  "repo": "circuit-synth/kicad-sch-api",
+  "stars": 53,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "API for manipulating sexpr in KiCAD schematic editor"
+ },
+ {
+  "repo": "psobot/musicboy",
+  "stars": 51,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A high-quality audio playback cartridge for Nintendo\u00ae Game Boy\u00ae and Game Boy Color\u00ae."
+ },
+ {
+  "repo": "sebastienroy/shutter_speed_tester",
+  "stars": 50,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A project which goal is to design and build a tool that allows to test the shutter speed accuracy of a film camera"
+ },
+ {
+  "repo": "Durburz/interphase",
+  "stars": 49,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "a mitosis clone with more keys!!1eleven"
+ },
+ {
+  "repo": "CGrassin/kicad-pinout-generator",
+  "stars": 49,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "This KiCad plugin generates pinouts from the PCB file to various formats."
+ },
+ {
+  "repo": "IntelligentElectron/universal-netlist",
+  "stars": 49,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Give AI agents the power to read Cadence, Altium, and KiCad designs"
+ },
+ {
+  "repo": "openeew/openeew-sensor",
+  "stars": 49,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Hardware for an OpenEEW sensor"
+ },
+ {
+  "repo": "mbtaylor1982/ReSDMAC",
+  "stars": 49,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "Verilog code to replace the Commodore SDMAC found in the A3000"
+ },
+ {
+  "repo": "pinguz97/Zynq-SoM",
+  "stars": 49,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "master",
+  "description": "Kicad design files for a Zynq 7020 SoM"
+ },
+ {
+  "repo": "UzixLS/zx-sizif-xxs",
+  "stars": 49,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Smallest ZX Spectrum clone with real Z80 and FPGA"
+ },
+ {
+  "repo": "tmarhguy/alu",
+  "stars": 48,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "8-bit combinational ALU built from scratch with 3,488 CMOS transistors (KiCad + SPICE + Logisim + 1.24M tests"
+ },
+ {
+  "repo": "HarveyBates/kandle",
+  "stars": 48,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A CLI that automatically imports external components into a KiCad project."
+ },
+ {
+  "repo": "galopago/misistemita",
+  "stars": 47,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Electronic hardware prototyping system. Solderless, robust and open source. Solves the typical problem of the circuit that works on a breadboard but stops working on a real-world setup. Easy to replicate and compatible with virtually every electronic module."
+ },
+ {
+  "repo": "RainbowLabsDE/USB2Speakon",
+  "stars": 47,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "main",
+  "description": "Self-contained 5W Class-D amplifier inside a Speakon connector"
+ },
+ {
+  "repo": "LibreSolar/bms-8s50-ic",
+  "stars": 47,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "master",
+  "description": "Fully integrated 12V-24V BMS using ISL94202"
+ },
+ {
+  "repo": "GuitarML/GuitarPedalSTM32",
+  "stars": 46,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Guitar pedal using a stm32h7 microcontroller programmed with CubeIDE (PCB and Firmware)"
+ },
+ {
+  "repo": "martinribelotta/h730duino",
+  "stars": 45,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "STM32H7 Arduino form factor and software compatible board"
+ },
+ {
+  "repo": "Pakequis/Bad-Thing-of-the-Edge-keyboard",
+  "stars": 45,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Mechanical keyboard for left hand with Raspberry Pi Pico for games."
+ },
+ {
+  "repo": "Ladniy/TK44",
+  "stars": 45,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "TK44 - is a wireless unibody 40% keyboard"
+ },
+ {
+  "repo": "stas2k/galspanic",
+  "stars": 44,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "X68000 RAM Expansion"
+ },
+ {
+  "repo": "RandomDelta6/USB-Mouse",
+  "stars": 43,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "A basic USB mouse PCB based on the PAW3526D8-FJY2 Sensor. "
+ },
+ {
+  "repo": "adamws/kicad-git",
+  "stars": 43,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Git actions directly from KiCad's PCB editor window"
+ },
+ {
+  "repo": "sssata/fluxpad",
+  "stars": 43,
+  "licence": "GPL-3.0",
+  "branch": "fluxpad-2",
+  "description": "Analog keypad with hall effect switches and rapid trigger for osu!"
+ },
+ {
+  "repo": "UzixLS/mist1010-board",
+  "stars": 43,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "10x10cm PCB variant of MIST FPGA project for G738/G706 enclosure"
+ },
+ {
+  "repo": "tomunderwood99/CharlieBoard",
+  "stars": 42,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "An open-source PCB map showing Boston's subway system"
+ },
+ {
+  "repo": "way2pramil/KiNotes",
+  "stars": 41,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Smart Notes for KiCad PCB Designers"
+ },
+ {
+  "repo": "badjeff/paw3395-pcb",
+  "stars": 41,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "An open source  breakout board for PixArt PAW3395DM-T6QU / PAW3950DM-T5QU low power optical mouse sensor."
+ },
+ {
+  "repo": "PTALTS-LK/RKD-OLD",
+  "stars": 41,
+  "licence": "GPL-3.0",
+  "branch": "V1.0",
+  "description": "\u4e00\u4e2a\u57fa\u4e8eRP2040+CH9329\u76844k\u97f3\u6e38\u63a7\u5236\u5668/\u53ef\u7f16\u7a0b\u952e\u76d8 \u652f\u6301\u6269\u5c55 \u786c\u4ef6\u5b8f SDVX v2\u7248\u672c\u6b63\u5728\u5f00\u53d1\u4e2d"
+ },
+ {
+  "repo": "antmicro/kicad-si-simulation-wrapper",
+  "stars": 40,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Prepare and optimize your KiCad PCB design for simulation with OpenEMS (https://github.com/thliebig/openEMS)"
+ },
+ {
+  "repo": "ChrisChrisLoLo/loongcat40",
+  "stars": 40,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "loongcat is loooooong"
+ },
+ {
+  "repo": "sunyitong/OPSX-SX70",
+  "stars": 40,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Open-source RP2040 replacement core board for the Polaroid SX-70 instant camera."
+ },
+ {
+  "repo": "MAKERSUN99/MAUS",
+  "stars": 40,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "MAUS Arduino USB Mouse Jiggler \u2013 Mini Programmable ATtiny85 \u2013 Open Source"
+ },
+ {
+  "repo": "Digi-Key/KiCad-Push-to-DigiKey",
+  "stars": 39,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Collect part numbers in KiCad schematic file (.kicad_sch) and push to Digi-Key myLists."
+ },
+ {
+  "repo": "h0lad/SolarMeshtasticNode",
+  "stars": 39,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "This is a Meshtastic Solar Node PCB based on the Heltec HT-CT62 and the linear  solar charge controller TI BQ25185."
+ },
+ {
+  "repo": "Jana-Marie/hoverboard-breakout",
+  "stars": 39,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Hoverboard breakout board."
+ },
+ {
+  "repo": "jsanpe/c2c-64",
+  "stars": 38,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A Composite & S-video to Component transcoder for the OSSC"
+ },
+ {
+  "repo": "nu31hackerspace/prismo",
+  "stars": 37,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Open-source $10 NFC/RFID door access controller for hackerspaces and makerspaces. ESP32-C3 + PN532, MQTT, Home Assistant, self-hosted"
+ },
+ {
+  "repo": "pcbcupid/Kicad-7-Series",
+  "stars": 37,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "This Repo is a collection of project files to a series of KiCad 7 tutorial, Which will take you through the journey of learning KiCad from scratch to making your first Printed Circuit Board."
+ },
+ {
+  "repo": "CGrassin/kicad-auto-silkscreen",
+  "stars": 37,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "This KiCad plugin automatically calculate the optimal silkscreen placement of reference designators."
+ },
+ {
+  "repo": "Fabien-Chouteau/Wee-Noise-Maker",
+  "stars": 37,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Open source pocket synthesizer"
+ },
+ {
+  "repo": "c0de111/tinta",
+  "stars": 37,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Battery-powered e-paper sign: room signage, sensor graphs, home automation, or anything over Wi-Fi. Wakes by real-time clock, NFC tap, or button. Raspberry Pi Pico W firmware, custom PCB, and 3D-printed case included."
+ },
+ {
+  "repo": "UzixLS/zx-multisound",
+  "stars": 37,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "ZX Spectrum soundcard for NEMOBUS/ZXBUS"
+ },
+ {
+  "repo": "CIRCUITSTATE/Mitayi-Pico-D1",
+  "stars": 36,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Open-Source RP2040 Microcontroller Development Board"
+ },
+ {
+  "repo": "Yanndroid/KiCAD-EasyEDA-Parts",
+  "stars": 36,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "KiCAD Plugin to download footprints, symbols and 3D models from EasyEDA and convert them for KiCAD"
+ },
+ {
+  "repo": "tscircuit/jlcsearch",
+  "stars": 36,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Find parts from JLCPCB matching design constraints (resistance values, capacitance, tolerance etc.)"
+ },
+ {
+  "repo": "4itor/moai",
+  "stars": 36,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "moai keyboard"
+ },
+ {
+  "repo": "JarrettR/FD-Autoplacer",
+  "stars": 36,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Force-directed component autoplacement for KiCad"
+ },
+ {
+  "repo": "4x1md/phone_rtty_interface",
+  "stars": 35,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "AFSK interface for Android smartphones and tablets."
+ },
+ {
+  "repo": "Milind220/kicad-ipc-rs",
+  "stars": 35,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "MIT licensed, fully updated, actively maintained Rust bindings for the KiCAD IPC API "
+ },
+ {
+  "repo": "Cimos/kicad-druid",
+  "stars": 35,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad custom design rules (.kicad_dru) matching JLCPCB and PCBWay manufacturing capabilities"
+ },
+ {
+  "repo": "sporniket/kicad-conversions--atari-ste-motherboard--c300780-001",
+  "stars": 35,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "A conversion to Kicad EDA of the schematics of a computer released around 1989 known as the \"Atari STE\"."
+ },
+ {
+  "repo": "AutopilotPi/AutoPilotPi-Hardware",
+  "stars": 35,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A SBC(Single Board Computer) to run autopilot firmware on linux"
+ },
+ {
+  "repo": "bobberdolle1/SkySweep32",
+  "stars": 34,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Open-source passive multi-band RF monitoring system | 855\u2013925 MHz, 2.4 GHz, 5.8 GHz | Rev C first prototype"
+ },
+ {
+  "repo": "lambdamikel/Talker-80",
+  "stars": 34,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A Modern Voice Synthesizer for the TRS-80 Model 1, Model III, and Model 4!"
+ },
+ {
+  "repo": "ziteh/pcb-motor",
+  "stars": 33,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "PCB axial flux PMSM/BLDC motor (WIP)"
+ },
+ {
+  "repo": "rhaamo/kicad-amiga2000",
+  "stars": 33,
+  "licence": "CC0-1.0",
+  "branch": "master",
+  "description": " Amiga 2000 revision 6.2 motherboard re-done in KiCAD.  WARNING: stability issue with Wicher 500i, could be noise related from accelerator speed. "
+ },
+ {
+  "repo": "Jana-Marie/LAEMP-Prism",
+  "stars": 33,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "The L\u00c4MP-Prism is an aesthetically pleasing and colorful effect lamp that can be used in your home."
+ },
+ {
+  "repo": "UzixLS/zx-sizif-128",
+  "stars": 32,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Easy-to-build minimalistic ZX Spectrum clone"
+ },
+ {
+  "repo": "hubertciebiada/open-ambient-sensor",
+  "stars": 31,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "OAS \u2014 Open Ambient Sensor: DIY multi-sensor indoor environmental monitor (CO2, PM, VOC/NOx, temperature/humidity, mmWave presence) on ESP32-C6 with ESPHome / Home Assistant integration"
+ },
+ {
+  "repo": "sommerper/framework16-keyboard-v1",
+  "stars": 30,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Ortholinear split keyboard for Framework 16"
+ },
+ {
+  "repo": "barisgit/KiLM",
+  "stars": 30,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad Library Manager | Easily manage global libraries with github"
+ },
+ {
+  "repo": "SumantKhalate/KiCad-libdb",
+  "stars": 30,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A KiCad V7 database library feature usage"
+ },
+ {
+  "repo": "4x1md/nikon_gps",
+  "stars": 30,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "DIY GPS module for Nikon DSLR"
+ },
+ {
+  "repo": "captainluzik/oh-my-embedded",
+  "stars": 29,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "OpenCode plugin for embedded systems engineering \u2014 ESP32, STM32, FreeRTOS, PCB design, component sourcing. Embedded engineer on steroids."
+ },
+ {
+  "repo": "0101shift/Project_OAK",
+  "stars": 29,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "All design files, source code, and documentation for Project OAK, a digital watch inspired by mechanical complications."
+ },
+ {
+  "repo": "maelh/radio-frequency-prototype-boards",
+  "stars": 29,
+  "licence": "BSD-3-Clause",
+  "branch": "main",
+  "description": "Radio frequency prototype boards (based on MegawattKS' design)"
+ },
+ {
+  "repo": "ikajdan/katia",
+  "stars": 29,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "A split keyboard with 6 by 3 column staggered keys and 3 thumb keys, based on the Crkbrd design"
+ },
+ {
+  "repo": "Jarins/Solder-Paste-Dispenser-with-DCMotor",
+  "stars": 29,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Motorized solder paste dispenser"
+ },
+ {
+  "repo": "valletw/esp-atx-power",
+  "stars": 28,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "ESP32 ATX Power Controller"
+ },
+ {
+  "repo": "badjeff/paw3222-pcb",
+  "stars": 28,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "An open source breakout board for PixArt PAW3222LU-TJDU low power optical mouse sensor."
+ },
+ {
+  "repo": "badjeff/pmw3610-pcb",
+  "stars": 28,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "An open source breakout board for PixArt PMW3610DM-SUDU low power optical mouse sensor."
+ },
+ {
+  "repo": "nandfarm/PowerRiser",
+  "stars": 28,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "PowerRiser \u2013 NVMe 2230 and 2242 Expansion board for Lenovo Tiny 5 Series"
+ },
+ {
+  "repo": "espena/dual-button-doorbell",
+  "stars": 27,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "ESP32 driven, WiFi-enabled dual-button doorbell with custom audio signals and real-time red/green indicators."
+ },
+ {
+  "repo": "emertcakir/OpenAirScope",
+  "stars": 26,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Open-source air quality and environmental monitoring node with STM32H743 + ESP32-C3, LoRaWAN, RS485, USB-C, Li-ion charging, and multi-sensor support."
+ },
+ {
+  "repo": "cajunpanda/gameboy-hifi-audio",
+  "stars": 26,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A HiFi audio mod for various Game Boy models"
+ },
+ {
+  "repo": "moellere/WireStudio",
+  "stars": 26,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Agent-driven design studio for ESPHome-compatible (e.g. ESP32/ESP8266, RP2040) + LoRaWAN devices: generates ESPHome YAML, KiCad schematic/PCB, 3D-printable enclosures, and builds/flashes/provisions LoRaWAN firmware (ChirpStack + Home Assistant)."
+ },
+ {
+  "repo": "Keitark/pcba-design-skills",
+  "stars": 26,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Modular Codex and Claude Code skills for electronic product planning, circuit review, schematic humanization, PCB layout, PCBA release, and JLCPCB ordering. EN/JA."
+ },
+ {
+  "repo": "ytmytm/c128-mmu-256k-exp",
+  "stars": 26,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "C128 MMU 256K RAM expansion"
+ },
+ {
+  "repo": "Spaceflight-Rocketry-Giessen-e-V/Telemetry",
+  "stars": 26,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-Source Rocket Telemetry System Based On Radiocrafts RC232 Radio Modules"
+ },
+ {
+  "repo": "openscopeproject/TransformIt",
+  "stars": 25,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Graphics scaling plugin for KiCad"
+ },
+ {
+  "repo": "aeonSolutions/AeonLabs-pcb-template-esp32-s3",
+  "stars": 25,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "PCB template ESP32 S3 with circuit schematic and KiCad project files"
+ },
+ {
+  "repo": "jeffqchen/Saturn8DINMod",
+  "stars": 25,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "8-pin mini DIN mod for Sega Saturn"
+ },
+ {
+  "repo": "FyraLabs/suzyqboard",
+  "stars": 25,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "An open Suzy-Q to hack your Chromebook with."
+ },
+ {
+  "repo": "tjko/tiny-picoprobe",
+  "stars": 25,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Tiny PicoProbe PCB"
+ },
+ {
+  "repo": "BeckhamLabsLLC/kicad-jlcpcb",
+  "stars": 24,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Claude Code plugin that turns a PCB idea into a wired .kicad_pcb ready for EasyEDA auto-routing and one-click JLCPCB ordering \u2014 LCSC part sourcing, EasyEDA pin-map auto-fetch, and session-persisted workflows."
+ },
+ {
+  "repo": "angelnu/esphome",
+  "stars": 24,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Settings for esphome"
+ },
+ {
+  "repo": "mackieks/nandFlex",
+  "stars": 24,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Low-profile NAND relocation FPC for Nintendo Wii"
+ },
+ {
+  "repo": "4x1md/qrp_swr_meter",
+  "stars": 24,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "External bridge SWR meter for Yaesu FT-817ND and other QRP HF transceivers."
+ },
+ {
+  "repo": "Supercookiegaming/Raspberry-Pi-Compute-Module-KiCad",
+  "stars": 23,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad library for all things Raspberry Pi Compute Module. Make compute module clones and carrier boards."
+ },
+ {
+  "repo": "4x1md/kicad_libraries",
+  "stars": 23,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Custom KiCad components used in my projects."
+ },
+ {
+  "repo": "Milind220/Ki-Stack",
+  "stars": 23,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Deep KiCad skills for coding agents"
+ },
+ {
+  "repo": "blwfish/kicad-mcp",
+  "stars": 23,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "MCP server for KiCad \u2014 71 tools for AI-assisted electronics design"
+ },
+ {
+  "repo": "DIYSynthMNL/Eurorack-Multi-Saturation-Module",
+  "stars": 23,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A multi saturation module with voltage controlled wet/dry mix"
+ },
+ {
+  "repo": "UzixLS/zxuno1010-board",
+  "stars": 23,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "10x10cm PCB variant of ZX-UNO project for G738/G706 enclosure"
+ },
+ {
+  "repo": "Zektopic/esp32-h2-supermini-kicad",
+  "stars": 22,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "This project focuses on the comprehensive development of a KiCad library component for the ESP32-H2-Supermini module. The goal is to provide accurate and high-quality resources for designers using KiCad to integrate this powerful wireless microcontroller into their projects."
+ },
+ {
+  "repo": "ziteh/moco",
+  "stars": 22,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "PMSM/BLDC motor controller/driver PCBs"
+ },
+ {
+  "repo": "protolux-electronics/soleil_hardware",
+  "stars": 22,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Hardware design files for Soleil, an open source power management and sleep control board for Raspberry Pi"
+ },
+ {
+  "repo": "Atlantix-EDA/atlantix-eda",
+  "stars": 22,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Programmatically generated PCB libraries facilitating robust electronic product design."
+ },
+ {
+  "repo": "10-X-eng/KiChad",
+  "stars": 22,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "KiChad \u2014 a Codex-integrated downstream of KiCad"
+ },
+ {
+  "repo": "UzixLS/zx-tsid",
+  "stars": 22,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "MOS SID sound card for ZX Spectrum"
+ },
+ {
+  "repo": "Swyter/psdaptwor",
+  "stars": 22,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "master",
+  "description": "An experimental PC adapter for EPCOT \u2014the PlayStation\u00aeVR2 headset\u2014 that splits USB Type-C\u00ae into DisplayPort video, USB 3 data and power. Intercepting its DP-AUX/SBU and CC side channels."
+ },
+ {
+  "repo": "EwoudVV/ducktop2",
+  "stars": 21,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "An open-source 16-inch laptop designed from scratch."
+ },
+ {
+  "repo": "byrantech/byrandev",
+  "stars": 21,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "byrandev, a nRF52840 dev board"
+ },
+ {
+  "repo": "Atlantix-EDA/CopperForge",
+  "stars": 21,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Companion PCB Release & Manufacturing Tool for KiCad"
+ },
+ {
+  "repo": "liuanlin-mx/z_extractor",
+  "stars": 21,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "convert kicad to openEMS"
+ },
+ {
+  "repo": "venice1200/MiSTer_SNAC2IEC",
+  "stars": 21,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Commodore/CBM IEC Adapter for MiSTer FPGA"
+ },
+ {
+  "repo": "tcsullivan/noisecard",
+  "stars": 21,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": " Solar powered noise measuring business card"
+ },
+ {
+  "repo": "catppuccin/kicad",
+  "stars": 20,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "\u26a1 Soothing pastel theme for KiCad"
+ },
+ {
+  "repo": "k0swe/mountaineer",
+  "stars": 20,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "Open hardware project for an integrated amateur radio interface device"
+ },
+ {
+  "repo": "funkeleinhorn/sc14cvmdect-devboard",
+  "stars": 20,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "SC14CVMDECT DEVBOARD"
+ },
+ {
+  "repo": "tomtor/STM32-RFM95-PCB",
+  "stars": 20,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "STM32 and AVR128 Printed Circuit Board for creating IOT nodes with the RFM95 LORA chip"
+ },
+ {
+  "repo": "Pippadi/combadge",
+  "stars": 20,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A Star Trek combadge built with the ESP32-S3"
+ },
+ {
+  "repo": "adamws/kicad-via-patterns",
+  "stars": 19,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "KiCad plugin for placing via patterns"
+ },
+ {
+  "repo": "omega9380/Retro-Schematics",
+  "stars": 19,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Recreating retro computer schematics in KiCAD"
+ },
+ {
+  "repo": "mprosk/mtg_life_counter",
+  "stars": 19,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Four player life counter for Magic: The Gathering"
+ },
+ {
+  "repo": "Open-Muscle/OpenMuscle-FlexGrid",
+  "stars": 19,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "60-sensor wearable with flexible PCB and pressure matrix"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenVTX",
+  "stars": 19,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source 5.8 GHz analog video transmitter with software-defined OSD (RTC6705, STM32G4). Early stage, no schematic yet."
+ },
+ {
+  "repo": "tuna-f1sh/kicad-makefile",
+  "stars": 19,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command included in 7.0 to generate output data for distribution and production."
+ },
+ {
+  "repo": "sufst/pcb",
+  "stars": 19,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Monorepo for all schematics and PCB designs"
+ },
+ {
+  "repo": "u-fire/kicnc",
+  "stars": 19,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "just another pcb2gcode GUI"
+ },
+ {
+  "repo": "KiCad/kicad-docker",
+  "stars": 19,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Mirror of https://gitlab.com/kicad/packaging/kicad-cli-docker. No PRs will be accepted in this repo."
+ },
+ {
+  "repo": "UzixLS/zx-sizif-512-ext",
+  "stars": 19,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Extension board for Sizif-512"
+ },
+ {
+  "repo": "TomNisbet/nqsap-pcb",
+  "stars": 18,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "NQSAP 8-bit computer PCB version"
+ },
+ {
+  "repo": "AchimPieters/mouse-bite.pretty",
+  "stars": 18,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Mouse bites KiCad footprints"
+ },
+ {
+  "repo": "siderakb/mdbt-micro",
+  "stars": 18,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A nRFMicro/Pro Micro compatible Bluetooth LE board, uses MDBT50Q nRF52840/nRF52833 module"
+ },
+ {
+  "repo": "tscircuit/cli",
+  "stars": 18,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Create electronics with React with a local development server"
+ },
+ {
+  "repo": "blueOkiris/ch552g-dev-board",
+  "stars": 18,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A simple breakout board with minimal hardware design for the CH552g"
+ },
+ {
+  "repo": "dj505/PicoFX",
+  "stars": 18,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A compact keyboard-style controller for Pump it Up"
+ },
+ {
+  "repo": "carlansell94/ds4-ext-charger",
+  "stars": 18,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Charge your Dualshock 4 using the EXT port with this board."
+ },
+ {
+  "repo": "tjko/brickpico",
+  "stars": 18,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "BrickPico - Open Source LED Light Controller"
+ },
+ {
+  "repo": "kkckrnz/treble",
+  "stars": 17,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A 42-key, low profile, monoblock mechanical keyboard"
+ },
+ {
+  "repo": "KabukiFlux/JAMMA_2player_xbox360",
+  "stars": 17,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "JAMMA Xbox360 wired controller for RGBUNTU/PI cheap"
+ },
+ {
+  "repo": "WibblyGhost/southerly-split-keeb",
+  "stars": 17,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Home built split keyboard which is based on the ZSA Voyager keyboard, using ergogen, kicad & fusion360 tools for keyboard design."
+ },
+ {
+  "repo": "maxlab-io/kiml",
+  "stars": 17,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "KiML: KiCAD MAXLAB Libray"
+ },
+ {
+  "repo": "electron271/tuxkeychain",
+  "stars": 17,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "Keychain shaped like Tux that can run Linux."
+ },
+ {
+  "repo": "DuBento/puffer",
+  "stars": 17,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "master",
+  "description": "Split Ergo Mechanical Keyboard"
+ },
+ {
+  "repo": "MLAB-project/Modules",
+  "stars": 17,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "MLAB hardware modules and building blocks"
+ },
+ {
+  "repo": "4x1md/avr_frs_shield",
+  "stars": 17,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "AVR Fuse Rescue Shield based on high voltage programmer by Jeff Keyzer aka \u200eMightyOhm."
+ },
+ {
+  "repo": "RobertGawron/GammaSpectrometer",
+  "stars": 16,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Device for quantitative analyze energy spectra of gamma-ray sources. Allows to study what radioactive isotopes in what quantities are present in measured sample."
+ },
+ {
+  "repo": "Eliot-Abramo/Kicad-Multi-PCB",
+  "stars": 16,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad Action Plugin for managing multiple PCBs (\u201csub-boards\u201d) from a single schematic (KiCad 10+)."
+ },
+ {
+  "repo": "ezxzeng/sweep_squared_rot",
+  "stars": 16,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Generated keyboard"
+ },
+ {
+  "repo": "Eymeric65/keyboard-kicad-lib",
+  "stars": 16,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Easy Keyboard KiCad Library \u2013 A beginner-friendly, open-source KiCad library for designing mechanical keyboards. Includes reversible footprints, 3D-print\u2013ready features, and full video tutorials from schematic to assembly. Used in builds like the Tokei Keyboard and Hillside Speedrun."
+ },
+ {
+  "repo": "MuratovAS/KiCadLibrary",
+  "stars": 16,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Component's library for KiCad"
+ },
+ {
+  "repo": "rniwase/tsuraraGB",
+  "stars": 16,
+  "licence": "BSD-3-Clause",
+  "branch": "main",
+  "description": "Nintendo Gameboy cartridge-shaped FPGA development board"
+ },
+ {
+  "repo": "PatrickBaus/SCAN2000",
+  "stars": 16,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "master",
+  "description": "Keithley  2000-SCAN solid-state relay replacement"
+ },
+ {
+  "repo": "w4b-zero/ESP32_mini_8Port_WLED",
+  "stars": 16,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "PCB and KiCad-Files for a 8Port WLED ESP32_mini Board"
+ },
+ {
+  "repo": "carlansell94/wii-u-usb-c-board",
+  "stars": 16,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A replacement board for a Wii U dock, with a USB type C connector."
+ },
+ {
+  "repo": "Kampi/BeeLight",
+  "stars": 16,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Zigbee environment sensor device with Zigbee2MQTT support."
+ },
+ {
+  "repo": "and3rson/deck65",
+  "stars": 16,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Simple SBC based on 65c02s"
+ },
+ {
+  "repo": "tscircuit/kicad-converter",
+  "stars": 15,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Convert kicad footprints to circuit json/tscircuit!"
+ },
+ {
+  "repo": "koron/yuiop",
+  "stars": 15,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "YUIOP: Etude of designing keyboards"
+ },
+ {
+  "repo": "biosshot/kicad-copilot",
+  "stars": 15,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "AI-powered MCP server for KiCad schematic generation, PCB placement, local routing, and project automation."
+ },
+ {
+  "repo": "ricaflops/Jupiter-II-Expansion",
+  "stars": 15,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Expansion board for Jupiter-II computer"
+ },
+ {
+  "repo": "SpectraSynq/K1.hardware",
+  "stars": 15,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Agent-driven KiCad and PCB automation for K1-Lightwave hardware"
+ },
+ {
+  "repo": "hmd83/tanen",
+  "stars": 15,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "LoRaWAN beehive monitor: hive weight, temperature and battery over TTN. Seeed XIAO nRF54LM20A + SX1262, Zephyr/nRF Connect SDK. ~4 uA sleep, ~10 year life on 3X AAA cell. Includes KiCad hardware and a Web Bluetooth config app."
+ },
+ {
+  "repo": "jyap808/pando58",
+  "stars": 15,
+  "licence": "CC-BY-SA-4.0",
+  "branch": "main",
+  "description": "58-key column staggered split keyboard"
+ },
+ {
+  "repo": "diminDDL/PiUPS",
+  "stars": 15,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "main",
+  "description": "A UPS for raspberry pis."
+ },
+ {
+  "repo": "OpenShock/Hardware",
+  "stars": 15,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "KiCAD files for PCBs for transmitters and other hardware for OpenShock."
+ },
+ {
+  "repo": "waterloo-rocketry/canhw",
+  "stars": 15,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Hardware monorepo avionics PCB"
+ },
+ {
+  "repo": "Chrismettal/ESP-Hiro",
+  "stars": 15,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "ESP-8266 Smart home dev board / general purpose IO for your home!"
+ },
+ {
+  "repo": "UzixLS/rgb2ypbpr",
+  "stars": 15,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "RGB to YPbPr converter"
+ },
+ {
+  "repo": "adom-inc/kicad_lib",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Rust library for working with KiCad files"
+ },
+ {
+  "repo": "adryzz/M.2-Key-E-Footprints",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "M.2 Key E KiCad footprints"
+ },
+ {
+  "repo": "slimcdk/wisweep",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "ESP32 and Trinamic based closed-loop stepper controller"
+ },
+ {
+  "repo": "devbisme/kinjector",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Inject/eject JSON data to/from KiCad files."
+ },
+ {
+  "repo": "karlcswanson/CatPatch",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "PCB Designs for a subsnake system"
+ },
+ {
+  "repo": "ikajdan/reflow-hot-plate",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A soldering reflow hot plate based on STM32"
+ },
+ {
+  "repo": "steelpuxnastik/SHINSANWASWITCH",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "DIY-friendly photointerrupter microswitch/lamp holder 2-in-1 for generic 100mm Chinese arcade buttons. Enables an OBSA-LHSXF+OBSA-100UMQ-like setup at low cost with generic parts."
+ },
+ {
+  "repo": "atoomnetmarc/IoT12",
+  "stars": 14,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Schematic, PCB files, firmware and 3d models for creating the IoT12 solder iron temperature controller for T12 compatible tips."
+ },
+ {
+  "repo": "Jana-Marie/USB-I2C-BRIDGE",
+  "stars": 14,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "CP2112 based USB I2C bridge"
+ },
+ {
+  "repo": "caffeinated-labs/Caffeinated-AFTONSPARV",
+  "stars": 14,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Glow up your AFTONSPARV planet lamp with smart-connectivity using ESP32. \ud83e\ude90 OSHW: DE000140"
+ },
+ {
+  "repo": "4x1md/analog_esr_meter",
+  "stars": 14,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Analog ESR meter."
+ },
+ {
+  "repo": "daneski13/Junco",
+  "stars": 14,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "Junco, an ergonomic split keyboard with rotary encoders. Powered by Raspberry Pi Pico"
+ },
+ {
+  "repo": "KabukiFlux/Duplicanator-Scart-Duplicator",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Duplicanator the Scart Duplicator"
+ },
+ {
+  "repo": "trailcurrentoss/TrailCurrentFireside",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A wall mounted or remote wireless display designed around the ESP32P4 and works with the TrailCurrent platform"
+ },
+ {
+  "repo": "vul-os/kerf",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Free, MIT-licensed CAD for every discipline \u2014 parametric modelling, drawings, FEM, CAM, PCB and BIM, chat-driven and offline-first. No accounts, no cloud, no billing. Part of Vulos."
+ },
+ {
+  "repo": "mohamedboubaker/Battery-Powered-STM32-Board-With-USB",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A Custom STM32 board that runs on a battery with MCP73831 and is easily programmable with USB thanks to the CP2102 USB-to-UART chip. "
+ },
+ {
+  "repo": "KabukiFlux/MIDI4MiSTer",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "MiSTer user port MIDI output and input PCB"
+ },
+ {
+  "repo": "Jana-Marie/mini-motor-controller",
+  "stars": 13,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "A controller for miniature stepper motors"
+ },
+ {
+  "repo": "SpectralVectors/BlenderMacroBoard",
+  "stars": 13,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Open Hardware Controller for Blender (contains KiCAD, Gerber, CircuitPython, and Addon files)"
+ },
+ {
+  "repo": "Spooky-Manufacturing/QEDA_old",
+  "stars": 13,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Quantum electronic design automation software for optical circuits"
+ },
+ {
+  "repo": "SnakeOilXY/SnakeOilXY-LFR",
+  "stars": 13,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Large format CoreXY 3D printer with a hybrid design of FR4 and printed parts."
+ },
+ {
+  "repo": "flypie/Ace-2019",
+  "stars": 13,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Reimplimentation of the Jupiter ACE with slightly more modern hardware. https://www.jupiter-ace.co.uk/ the KiCad versions are the up to date designs which are available at https://jupiterdeuce.blogspot.com and https://github.com/flypie/Ace-2019 "
+ },
+ {
+  "repo": "nvrooijen/KiLeidoscope",
+  "stars": 13,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Interactive & Real-time bridge between KiCad & Blender: live 3D view, X-ray mode and Cycles renders of your PCB"
+ },
+ {
+  "repo": "UzixLS/rgb2svideo",
+  "stars": 13,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Converts RGB + Sync analog signal to S-Video (and also Composite)."
+ },
+ {
+  "repo": "KabukiFlux/Scart-Megadrive-2-12v-cable",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "PCB form Megadrive/Genesis 2 RGB minidin to Scart adapter with 12V DCDC boost (4:3 switching)"
+ },
+ {
+  "repo": "galopago/misistemote",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Misistemote is an Open Source, modular ecosystem that uses pre-made PCB to mix and match your choice of processor board. Is oriented to make small, mobile, battery powered electronic projects work in real conditions in a very short time."
+ },
+ {
+  "repo": "bentwire/USB-C-FUSB302-PI",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "dubplate",
+  "description": "Dev board for RP2040 and FUSB302B"
+ },
+ {
+  "repo": "niw/mfk60",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "60% ANSI Layout Split Keyboard. mfk60 is My First Keyboard, 60%."
+ },
+ {
+  "repo": "root670/dance-pad",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Dance pad using FSRs and RGB LEDs in an extruded aluminum frame."
+ },
+ {
+  "repo": "sparkengineering/kicad-action",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "GitHub Action to automate KiCad tasks, e.g. check ERC/DRC on pull requests or generate production files for releases"
+ },
+ {
+  "repo": "kevontheweb/tokyo-night-kicad-theme",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A clean Kicad schematic editor (eeschema) theme that celebrates the lights of Downtown Tokyo at night."
+ },
+ {
+  "repo": "oMatheus13/KiFlux",
+  "stars": 12,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "A smart CLI tool to import EasyEDA/LCSC components, manage KiCad libraries, and export standardized BOM/CPL files for PCB manufacturing."
+ },
+ {
+  "repo": "kcuzner/midi-fader",
+  "stars": 12,
+  "licence": "Apache-2.0",
+  "branch": "master",
+  "description": "Expandable USB MIDI device with faders and buttons"
+ },
+ {
+  "repo": "atonizzo/seatalk_wifi",
+  "stars": 12,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "A bridge between Raymarine's Seatalk protocol and NMEA 0183 over a WiFi network."
+ },
+ {
+  "repo": "74th/74th-kicad-parts",
+  "stars": 12,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "74th\u304c\u4f7f\u3046KiCad Parts"
+ },
+ {
+  "repo": "techy-robot/Mighty-Micro-Motors",
+  "stars": 12,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Tiny drone motors with a high reduction gearbox, a precise mangetic encoder, and a FOC controller"
+ },
+ {
+  "repo": "alsoknownasfoo/SpinRender",
+  "stars": 12,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "KiCad plugin for generating spinning 3D render videos/GIFs of your PCB \u2014 presets, lighting, and export via kicad-cli."
+ },
+ {
+  "repo": "PlummersSoftwareLLC/PongPCB",
+  "stars": 12,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "KiCad project and Gerber files for Pong Composite Video replacement PCB"
+ },
+ {
+  "repo": "overset/trackball",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Custom trackball with minimal base, 55mm metal ball, capacitive touch for clicking, haptic feedback and scroll support for horizontal movement. Using Adafruit QT Py (SAMD21) MCU and PMW3389 optical sensor breakout."
+ },
+ {
+  "repo": "klein0r/pcb-footprint-collection-kicad",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Just a small collection of self designed footprints for KiCad"
+ },
+ {
+  "repo": "WoolseyWorkshop/Article-Performing-A-Circuit-Simulation-In-KiCad",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "Performing A Circuit Simulation In KiCad Article Resources"
+ },
+ {
+  "repo": "ProductOfAmerica/mcp-server-kicad",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "KiCad MCP server: 100+ Model Context Protocol tools that let an AI assistant do schematic capture and PCB layout. Place parts, route traces, run ERC and DRC, export Gerbers, BOM, and 3D models."
+ },
+ {
+  "repo": "JaninaWibker/jdkbd",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "split 40% ortholinear keyboard based the corne keyboard by foostan"
+ },
+ {
+  "repo": "pmnxis/Lambda_KICAD_LIB",
+  "stars": 11,
+  "licence": "MIT",
+  "branch": "kicad7",
+  "description": "Lambda Series Kicad5 Lib"
+ },
+ {
+  "repo": "belaszalontai/kipilot-mcp",
+  "stars": 11,
+  "licence": "Apache-2.0",
+  "branch": "main",
+  "description": "Model Context Protocol (MCP) server for KiCad, enabling Agentic AI workflows for SCH and PCB design."
+ },
+ {
+  "repo": "siderakb/calcite",
+  "stars": 11,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "60/52 keys Kailh Choc V1 low profile switches ortho keyboard"
+ },
+ {
+  "repo": "zosko/NoahFC",
+  "stars": 11,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "NoahFC - Atmega328 based Flight Controller"
+ },
+ {
+  "repo": "aalonsopuig/Circuitos_electronicos",
+  "stars": 11,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "2024. Circuitos electr\u00f3nicos con LTSpice, Falstad, Kicad y otros simuladores y EDA"
+ },
+ {
+  "repo": "weirdgyn/Driverino-Shield",
+  "stars": 11,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Driverino-Shield is an Arduino based simple, low power controller for PM BLDC sensored motors."
+ },
+ {
+  "repo": "SK-Electronics-Consulting/kicad-coil-generators",
+  "stars": 11,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "PCB Coil Generators for KiCAD"
+ },
+ {
+  "repo": "transistorfet/z280",
+  "stars": 11,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A Single Board Computer with a Z280 CPU using the Z-BUS interface"
+ },
+ {
+  "repo": "Vaaarad07/PCB_Designs",
+  "stars": 10,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A repo with STM32 based PCB designs"
+ },
+ {
+  "repo": "brenocq/bldc-motor",
+  "stars": 10,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "High-precision BLDC motor and controller development from scratch (in progress...)"
+ },
+ {
+  "repo": "JordanAceto/micro-pico",
+  "stars": 10,
+  "licence": "CC-BY-4.0",
+  "branch": "main",
+  "description": "Tiny analog monosynth with 2 SSI2130 VCOs and swappable filter"
+ },
+ {
+  "repo": "protolux-electronics/trellis_core",
+  "stars": 10,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "A barebones KiCad project for Allwinner T113-based designs"
+ },
+ {
+  "repo": "ICDT-Inatel-Cubesat-Design-Team/S-Band-Antenna",
+  "stars": 10,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "main",
+  "description": "S-Band RHCP 2.45 GHz Patch Antenna for 1U CubeSats"
+ },
+ {
+  "repo": "OpenDrone-hw/OpenAIO",
+  "stars": 10,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Open-source AIO for 2-6S toothpick quads: flight controller, 4-in-1 AM32 ESC and ExpressLRS receiver, 25.5x25.5 mm."
+ },
+ {
+  "repo": "RobertGawron/IonizationChamber",
+  "stars": 10,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Nuclear radiation sensor with ionization chamber as a detector. Hard to make, IMHO inferior to semiconductor detectors. "
+ },
+ {
+  "repo": "mlab-modules/ISM01",
+  "stars": 10,
+  "licence": "GPL-3.0",
+  "branch": "ISM01A",
+  "description": "High-performance wireless transceiver, ideal for remote control, data links, and sensor networks."
+ },
+ {
+  "repo": "epsilon-0311/system-on-a-business-card",
+  "stars": 10,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "A miniature system that is also a business card"
+ },
+ {
+  "repo": "dereulenspiegel/cbpi_hat",
+  "stars": 10,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "Raspberry Pi hat for CraftBeerPi"
+ },
+ {
+  "repo": "Milind220/kiutils-rs",
+  "stars": 9,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Rust-native KiCAD parser/writer - Write in Rust, convert seamlessly to KiCAD design files"
+ },
+ {
+  "repo": "Alex-2-Graf/LGT-Turbo-Sound-emulator",
+  "stars": 9,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Hardware Turbo Sound (Dual AY/YM) emulator for ZX Spectrum. Powered by high-speed LGT8F328P MCU using built-in DAC. Available in DIP-28 and DIP-40 drop-in form-factors."
+ },
+ {
+  "repo": "tscircuit/kicad-viewer",
+  "stars": 9,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "View all the official kicad library files on the web"
+ },
+ {
+  "repo": "lambdakb/trackball-lt6c",
+  "stars": 9,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "LT6C 6 Keys Trackball"
+ },
+ {
+  "repo": "alekssadowski95/Open-Source-Measurement-Equipment",
+  "stars": 9,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Open-source framework for designing and manufacturing measurement equipment devices"
+ },
+ {
+  "repo": "KabukiFlux/pi-rgb-cable-sync-mixer",
+  "stars": 9,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Small PCB mod to mix the sync in the RGBpi cable to solve sync issues"
+ },
+ {
+  "repo": "schilkp/74Logic_SA_ADC",
+  "stars": 9,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A discrete Successive Approximation ADC built from individual logic gates."
+ },
+ {
+  "repo": "KabukiFlux/NES-IO-Board-nessionator",
+  "stars": 9,
+  "licence": "BSD-3-Clause",
+  "branch": "main",
+  "description": "Nessionator, the NESRGB mod output board"
+ },
+ {
+  "repo": "tor1kk/bms-buck-boost",
+  "stars": 9,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Battery Management System (BMS) with Buck-Boost Converter"
+ },
+ {
+  "repo": "mlab-modules/USBI2C01",
+  "stars": 8,
+  "licence": "GPL-3.0",
+  "branch": "USBI2C01A",
+  "description": "USB device to I\u00b2C master adapter with Linux kernel support"
+ },
+ {
+  "repo": "UzixLS/atfblast",
+  "stars": 8,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "ATF/GAL chips programmer"
+ },
+ {
+  "repo": "UsbCANConverter-UCCbasic/UCCBPCB",
+  "stars": 8,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "Printed circuit board for UCCB"
+ },
+ {
+  "repo": "meowmeowahr/KevinbotV3-KiCAD",
+  "stars": 7,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "RevB",
+  "description": "Kevinbot Core - Parallax Propeller 2 Robot Controller"
+ },
+ {
+  "repo": "Mage-Control-Systems-Ltd/NCCM",
+  "stars": 7,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Net Class Clearance Matrix plugin for KiCad. Declare clearances between net classes from a matrix table."
+ },
+ {
+  "repo": "mlab-modules/GPS02",
+  "stars": 7,
+  "licence": "GPL-3.0",
+  "branch": "GPS02B",
+  "description": "GNSS reciever ready to RTK (Real time kinematics) technology"
+ },
+ {
+  "repo": "hoijui/kicad-image-injector",
+  "stars": 7,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "A stand-alone (python) tool to replace rectangular template areas drawn onto a KiCad PCB with B&W images or QR-Codes."
+ },
+ {
+  "repo": "Mage-Control-Systems-Ltd/KiABOM",
+  "stars": 7,
+  "licence": "GPL-3.0",
+  "branch": "main",
+  "description": "Automatic Bill Of Materials tool for KiCad, written in Python. Returns order codes, prices, manufacturer, and more, by interfacing with supplier APIs"
+ },
+ {
+  "repo": "andykarpov/karabas-megabuzz",
+  "stars": 7,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A minimalistic FPGA soundcard for ZX Spectrum"
+ },
+ {
+  "repo": "tscircuit/dsn-converter",
+  "stars": 6,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "Typescript module for converting Specctra DSN into Circuit JSON"
+ },
+ {
+  "repo": "MikeWent/svg2stl",
+  "stars": 6,
+  "licence": "MIT",
+  "branch": "main",
+  "description": "convert SVG to STL for 3D printing (PCB making)"
+ },
+ {
+  "repo": "botanicfields/Keypad-for-IC705",
+  "stars": 6,
+  "licence": "CC0-1.0",
+  "branch": "main",
+  "description": "External Keypad for ICOM IC-705"
+ },
+ {
+  "repo": "jvedder/Biploar-power-supply-KiCAD",
+  "stars": 6,
+  "licence": "CERN-OHL-P-2.0",
+  "branch": "main",
+  "description": "A KiCAD PCB project for a simple linear bipolar power supply (+/-15V) from a 24V single-phase transformer."
+ },
+ {
+  "repo": "UzixLS/pc-ega-composite-daughterboard",
+  "stars": 6,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "CVBS daughterboard for EGA videocard"
+ },
+ {
+  "repo": "sidstuff/robot",
+  "stars": 5,
+  "licence": "MIT",
+  "branch": "master",
+  "description": "A KiCad PCB for an obstacle avoiding robot."
+ },
+ {
+  "repo": "0rax/esphome-xiao-base",
+  "stars": 5,
+  "licence": "CERN-OHL-S-2.0",
+  "branch": "main",
+  "description": "XIAO base board PCB & configuration for ESPHome based sensors."
+ },
+ {
+  "repo": "LibreSolar/uext-esp32-c3",
+  "stars": 5,
+  "licence": "CERN-OHL-W-2.0",
+  "branch": "main",
+  "description": null
+ },
+ {
+  "repo": "ckflight/RF_DIRECTIONAL_BRIDGE",
+  "stars": 5,
+  "licence": "GPL-3.0",
+  "branch": "master",
+  "description": "300 KHz to 13.5 GHz Directional Bridge 16 dB coupling, 1dB Insertion Loss and min. 30 dB directivity Directional Bridge"
+ }
+]
