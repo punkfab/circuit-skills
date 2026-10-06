@@ -188,6 +188,8 @@ def route_board(board, backend, work, seconds):
         bare.write_text(strip_routing(board.read_text()))
         if board.with_suffix('.kicad_pro').exists():
             shutil.copy(board.with_suffix('.kicad_pro'), bare.with_suffix('.kicad_pro'))
+        py = os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3')
+        subprocess.run([py, str(HERE / 'zone_fill.py'), str(bare), '--unfill'], capture_output=True)  # a stale fill is an obstacle to it
         cmd = [tracemaker_bin() or 'tracemaker', 'route', str(bare), '-o', str(out), '--time', str(seconds),
                '--threads', os.getenv('TRACEMAKER_THREADS', '8'), '--no-kb']
     elif name in ('freerouting', 'fastroute'):
@@ -201,6 +203,7 @@ def route_board(board, backend, work, seconds):
     code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', env, timeout=seconds + 300)
     if name == 'tracemaker' and out.exists():
         code = 0  # it exits non-zero when connections are left open; the board it wrote is still a candidate
+        subprocess.run([os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3'), str(HERE / 'zone_fill.py'), str(out)], capture_output=True)
     pro = board.with_suffix('.kicad_pro')
     if pro.exists() and out.exists():
         shutil.copy(pro, out.with_suffix('.kicad_pro'))

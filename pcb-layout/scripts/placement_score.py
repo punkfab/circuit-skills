@@ -20,6 +20,13 @@ to a PCB:
               against the routing channels around its outline. Above 1.0 its pins cannot all get out
               on the routing layers.
 
+  compare     one number for comparing two placements of the SAME board (lower is better): a weighted sum
+              of log(1 + x) over ratsnest crossings per net, over-capacity area, peak congestion, pads off
+              the board, overlapping bodies and decoupling distance. The weights are fitted on 64 real
+              boards x 5 placements each, routed and judged by KiCad DRC (evals/corpus/score_study.py): on
+              boards held out of the fit it picks the placement that routes better 89% of the time, against
+              79% for peak congestion alone. It is not calibrated across different boards.
+
 Prints a summary and the hotspots (connected over-capacity regions) with the parts in them; --json
 writes everything (the grid too) for route_eval.py --analyze; --svg writes a heat map. All numbers
 are estimates for comparing placements of the same board, not absolute pass/fail.
@@ -115,7 +122,7 @@ def read_board(text):
             pads.append(p); mine.append(p)
         if mine:
             xs = [p['x'] for p in mine]; ys = [p['y'] for p in mine]
-            parts.append({'ref': ref, 'x': fx, 'y': fy, 'pads': mine, 'bbox': (min(xs) - 0.5, min(ys) - 0.5, max(xs) + 0.5, max(ys) + 0.5)})
+            parts.append({'ref': ref, 'x': fx, 'y': fy, 'pads': mine, 'side': (kid(fp, 'layer') or [None, 'F.Cu'])[1], 'bbox': (min(xs) - 0.5, min(ys) - 0.5, max(xs) + 0.5, max(ys) + 0.5)})
     x0 = y0 = math.inf; x1 = y1 = -math.inf
     for g in root:
         if isinstance(g, list) and str(g[0]).startswith('gr_') and (kid(g, 'layer') or [None, None])[1] == 'Edge.Cuts':
@@ -178,6 +185,40 @@ def crosses(a, b, c, d):
 
 
 PIN_WEIGHT = 1.0
+
+
+# Fitted by evals/corpus/score_analyze.py (logistic regression on log1p differences between placements of one
+# board; 494 pairs, 64 boards). Wirelength is absent on purpose: the fit wanted to reward longer wires, because
+# the machine placements in the study are compact and illegal. Refit there, then copy score_weights.json here.
+COMPARE_WEIGHTS = {'crossings_per_net': 1.7269, 'over_capacity_pct': 1.7473, 'off_board_pads': 1.405, 'decap_mm': 1.145,
+                   'congestion_max': 0.7661, 'overlaps': 0.205}
+GROUND = re.compile(r'(^|/)(A|D|P)?(GND|VSS)\w*$', re.I)
+
+
+def intent(b):
+    """Legality and intent measures a wiring estimate misses: pads off the board, bodies on top of each other
+    (pad extents, same side), and how far each decoupling capacitor sits from the pin it serves."""
+    x0, y0, x1, y1 = b['bbox']
+    off = sum(1 for p in b['pads'] if p['net'] and not (x0 - 0.1 <= p['x'] <= x1 + 0.1 and y0 - 0.1 <= p['y'] <= y1 + 0.1))
+    boxes = [(p.get('side'), p['bbox'][0] + 0.5, p['bbox'][1] + 0.5, p['bbox'][2] - 0.5, p['bbox'][3] - 0.5) for p in b['parts']]
+    overlaps = sum(1 for i, a in enumerate(boxes) for c in boxes[i + 1:]
+                   if a[0] == c[0] and min(a[3], c[3]) - max(a[1], c[1]) > 0.05 and min(a[4], c[4]) - max(a[2], c[2]) > 0.05)
+    big = {}
+    for part in b['parts']:
+        if len(part['pads']) >= 6:
+            for pad in part['pads']:
+                if pad['net']:
+                    big.setdefault(pad['net'], []).append((pad['x'], pad['y']))
+    decaps = []
+    for part in b['parts']:  # a two-pad C with one pad on ground: its other pad to the nearest pad of that net on a 6+ pad part
+        pads = [p for p in part['pads'] if p['net']]
+        if part['ref'].startswith('C') and len(part['pads']) == 2 and len(pads) == 2 and sum(bool(GROUND.search(p['net'])) for p in pads) == 1:
+            hot = next(p for p in pads if not GROUND.search(p['net']))
+            if big.get(hot['net']):
+                decaps.append({'ref': part['ref'], 'net': hot['net'], 'mm': round(min(math.dist((hot['x'], hot['y']), q) for q in big[hot['net']]), 2)})
+    decaps.sort(key=lambda d: -d['mm'])
+    return {'off_board_pads': off, 'overlaps': overlaps, 'decaps': decaps,
+            'decap_mm': round(sum(d['mm'] for d in decaps) / len(decaps), 2) if decaps else 0.0}
 
 
 def score(board_path, cell=1.0, pin_weight=None):
@@ -297,7 +338,12 @@ def score(board_path, cell=1.0, pin_weight=None):
                        'ratio': round(must / channels, 2) if channels else None})
     escape.sort(key=lambda e: -(e['ratio'] or 0))
 
+    it = intent(b)
+    terms = {'crossings_per_net': crossings / max(1, len(signal)), 'over_capacity_pct': 100 * over / len(flat), 'off_board_pads': it['off_board_pads'],
+             'decap_mm': it['decap_mm'], 'congestion_max': flat[-1], 'overlaps': it['overlaps']}
+    contrib = {k: round(COMPARE_WEIGHTS[k] * math.log1p(max(0.0, v)), 3) for k, v in terms.items()}
     return {
+        'intent': it, 'compare': {'score': round(sum(contrib.values()), 3), 'terms': contrib},
         'board': str(board_path), 'cell_mm': cell, 'routing_layers': layers, 'plane_nets': sorted(b['plane_nets']),
         'pitch_mm': round(pitch, 3), 'signal_nets': len(signal),
         'congestion': {'max': round(flat[-1], 2), 'p95': round(p95, 2), 'over_capacity_cells': over,
@@ -341,6 +387,10 @@ def main():
           f"{' (planes: ' + ', '.join(s['plane_nets']) + ')' if s['plane_nets'] else ''}, pitch {s['pitch_mm']} mm")
     print(f"  congestion  max {c['max']}  p95 {c['p95']}  hot (top decile) >= {c['hot_threshold']}, cores (top 3%) >= {c['core_threshold']}; over 1.0: {c['over_capacity_cells']} cells")
     print(f"  ratsnest    {r['mst_mm']} mm MST, {r['crossings']} crossings")
+    it, cmp = s['intent'], s['compare']
+    worst = ', '.join(f"{d['ref']} {d['mm']} mm" for d in it['decaps'][:3])
+    print(f"  intent      {it['off_board_pads']} pads off the board, {it['overlaps']} overlapping bodies, decoupling mean {it['decap_mm']} mm" + (f" (farthest: {worst})" if worst else ''))
+    print(f"  compare     {cmp['score']}  (lower is better, same board only; biggest terms: " + ', '.join(f'{k} {v}' for k, v in sorted(cmp['terms'].items(), key=lambda kv: -kv[1])[:3]) + ')')
     for e in s['escape']:
         print(f"  escape      {e['ref']}: {e['signal_pins']} signal pins at {e['pitch']} mm pitch, demand/channels {e['ratio']}")
     for h in s['hotspots'][:6]:

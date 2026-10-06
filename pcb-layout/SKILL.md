@@ -1008,6 +1008,15 @@ python3 scripts/route_eval.py route-evals/<run> --analyze      # (also runs afte
 - **Ratsnest:** minimum-spanning-tree length and crossings between nets.
 - **Escape:** fine-pitch parts (>= 16 pads, pitch <= 0.65 mm along a pin row): signal pins vs the
   routing channels around the outline.
+- **Intent:** pads off the board, overlapping bodies, and each decoupling capacitor's distance to the pin
+  it serves (farthest first).
+- **Compare:** one number for ranking **two placements of the same board**, lower is better. It is a
+  weighted sum of crossings per net, over-capacity area, peak congestion, pads off the board, overlaps
+  and decoupling distance, with weights fitted on 64 real boards x 5 placements each, routed and judged
+  by KiCad DRC (`evals/corpus/score_study.py`). On held-out boards it picks the placement that routes
+  better **89%** of the time; peak congestion alone gets 79%. Between two legal placements, crossings
+  per net is the strongest single measure (90%); congestion is the weakest (64%). Do not compare the
+  number across different boards.
 - **Hotspots** are clusters of the board's **top-3% cells**, named by the parts in them. The score is
   **relative on purpose**: on einhander it never exceeds 0.82 (nothing is "over capacity" in absolute
   terms) yet **78-100% of every router's defects fall in its top-20% cells**, and its two cores (U1/U2

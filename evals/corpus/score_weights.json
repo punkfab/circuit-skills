@@ -1,0 +1,14 @@
+{
+ "transform": "log1p",
+ "weights": {
+  "crossings_per_net": 1.7269,
+  "congestion_max": 0.7661,
+  "over_capacity_pct": 1.7473,
+  "overlaps": 0.205,
+  "off_board_pads": 1.405,
+  "decap_mm": 1.145
+ },
+ "pairs": 494,
+ "boards": 64,
+ "cv_pairwise": 0.889
+}
