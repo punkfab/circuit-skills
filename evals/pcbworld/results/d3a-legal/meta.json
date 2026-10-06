@@ -1,0 +1,11 @@
+{
+ "run": "d3a-legal",
+ "split": "d3a",
+ "backends": "srj-legal:all",
+ "time": 60,
+ "data": "/home/dan/.cache/circuit-skills/pcbworld/pcbench/exacad_sorted",
+ "versions": {
+  "circuit_skills": "a0cdac3",
+  "capacity_autorouter": "0.0.958"
+ }
+}

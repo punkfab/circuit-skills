@@ -13,6 +13,8 @@ Backends (default: every one available here):
   fastroute             route4.sh with FastRoute (needs FASTROUTE_BIN)
   tscircuit[:PRESET]    route4.sh with the design's own tscircuit router (default preset auto_local)
   srj[:all|outer|auto]  route_srj.mjs: tscircuit's capacity autorouter on the KiCad board itself
+  srj-legal[:LAYERS]    the same, then finish_legal.py: the tracks KiCad's DRC objects to are deleted and
+                        TraceMaker re-routes those connections (needs tracemaker). Bare boards only.
   current               the board as it is now (a baseline, never re-routed)
 
 A project directory (index.circuit.tsx + node_modules) runs the full route4.sh pipeline per backend
@@ -68,7 +70,7 @@ def available():
     found.append('tscircuit:auto_local')
     srj = Path(os.getenv('CAPACITY_AUTOROUTER') or HERE / 'srj') / 'node_modules' / '@tscircuit' / 'capacity-autorouter'
     if srj.exists():
-        found += ['srj:all', 'srj:outer']
+        found += ['srj:all', 'srj:outer'] + (['srj-legal:all'] if tracemaker_bin() else [])
     return found
 
 
@@ -198,9 +200,16 @@ def route_board(board, backend, work, seconds):
         cmd = [py, str(HERE / 'route_kicad_dsn.py'), str(board), '-o', str(out), '--backend', name, '--time', str(seconds)]
         if name == 'freerouting' and opt:
             env = {'FREERT': freert(opt) or f'no-freerouting-{opt}-launcher'}
+    elif name == 'srj-legal':
+        raw = work / f'{backend.replace(":", "-")}.raw.kicad_pcb'
+        for ext in ('.kicad_pro', '.kicad_dru'):  # the finisher judges and routes against the board's own rules
+            if board.with_suffix(ext).exists():
+                shutil.copy(board.with_suffix(ext), raw.with_suffix(ext))
+        cmd = ['bash', '-c', 'node "$0" "$1" -o "$2" --layers "$3" --time "$4" && python3 "$5" "$2" -o "$6" --time "$7"',
+               str(HERE / 'route_srj.mjs'), str(board), str(raw), opt or 'auto', str(seconds), str(HERE / 'finish_legal.py'), str(out), str(max(10, seconds // 2))]
     else:
         cmd = ['node', str(HERE / 'route_srj.mjs'), str(board), '-o', str(out), '--layers', opt or 'auto', '--time', str(seconds)]
-    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', env, timeout=seconds + 300)
+    code, secs = run(cmd, work, work / f'{backend.replace(":", "-")}.log', env, timeout=seconds * 4 + 300)
     if name == 'tracemaker' and out.exists():
         code = 0  # it exits non-zero when connections are left open; the board it wrote is still a candidate
         subprocess.run([os.getenv('CIRCUIT_SKILLS_KICAD_PYTHON', '/usr/bin/python3'), str(HERE / 'zone_fill.py'), str(out)], capture_output=True)
@@ -353,11 +362,11 @@ def main():
     if not board.exists():
         p.error(f'no board at {board}')
     backends = a.backends.split(',') if a.backends else available()
-    if is_project and any(b == 'tracemaker' for b in backends):
-        print('(tracemaker routes a bare .kicad_pcb, not the project pipeline; skipping)')
-        backends = [b for b in backends if b != 'tracemaker']
+    if is_project and any(b.split(':')[0] in ('tracemaker', 'srj-legal') for b in backends):
+        print('(tracemaker and srj-legal route a bare .kicad_pcb, not the project pipeline; skipping)')
+        backends = [b for b in backends if b.split(':')[0] not in ('tracemaker', 'srj-legal')]
     if not is_project:
-        bare = ('srj', 'current', 'freerouting', 'fastroute', 'tracemaker')
+        bare = ('srj', 'srj-legal', 'current', 'freerouting', 'fastroute', 'tracemaker')
         dropped = [b for b in backends if b.split(':')[0] not in bare]
         if dropped:
             print(f'(a bare board cannot use {", ".join(dropped)}: it needs the tscircuit project; skipping)')
