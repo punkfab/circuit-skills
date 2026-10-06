@@ -96,6 +96,7 @@ export function readRules(boardPath, flags = {}) {
   return r;
 }
 
+const EXTRA = Number(process.env.SRJ_EXTRA_CLEARANCE || 0);  // mm added to every clearance the router is told
 export function boardToSrj(text, opts = {}) {
   const root = parseSExpr(text);
   const copper = (kid(root, "layers") ?? []).filter((l) => Array.isArray(l) && /\.Cu$/.test(l[1] ?? "")).map((l) => l[1]);
@@ -216,8 +217,8 @@ export function boardToSrj(text, opts = {}) {
       ...(outline ? { outline } : {}),
       minTraceWidth: r.minTrace, nominalTraceWidth: r.trace,
       minViaHoleDiameter: r.drill, minViaPadDiameter: r.via, minViaDiameter: r.via,
-      defaultObstacleMargin: r.clearance, minTraceToPadEdgeClearance: r.clearance, minTraceToHoleEdgeClearance: Math.max(r.clearance, 0.25),
-      minBoardEdgeClearance: 0.3, minViaEdgeToPadEdgeClearance: r.clearance,
+      defaultObstacleMargin: r.clearance + EXTRA, minTraceToPadEdgeClearance: r.clearance + EXTRA, minTraceToHoleEdgeClearance: Math.max(r.clearance + EXTRA, 0.25),
+      minBoardEdgeClearance: 0.3, minViaEdgeToPadEdgeClearance: r.clearance + EXTRA,
       minViaHoleEdgeToViaHoleEdgeClearance: 0.5, minPlatedHoleDrillEdgeToDrillEdgeClearance: 0.5,
       obstacles: used, connections,
       bounds: { minX: x0, maxX: x1, minY: 0 - y1, maxY: 0 - y0 }, // 0 - v: no -0 at the origin
@@ -250,7 +251,15 @@ export function routesToKicad(traces, netNumbers, rules) {
   const toKicad = (l) => (l === "top" ? "F.Cu" : l === "bottom" ? "B.Cu" : `In${l.replace("inner", "")}.Cu`);
   const items = [];
   const vias = new Map(); // "x,y" -> net : duplicates of one net at one spot are one via
-  let segments = 0, duplicates = 0;
+  let segments = 0, duplicates = 0, widened = 0;
+  // The router necks some segments down to 0.1 mm whatever minTraceWidth says. SRJ_CLAMP=1 writes them at
+  // the net's width instead; measured on 40 PCBWorld boards that trades each width error for a short or a
+  // clearance error (the neck-downs are where it squeezed), so it is off unless asked for.
+  const width = (p, name) => {
+    const want = rules.netWidth?.(name) ?? rules.minTrace ?? rules.trace, got = p.width ?? rules.trace;
+    if (got >= want - 1e-9 || !process.env.SRJ_CLAMP) return got;
+    widened++; return want;
+  };
   for (const t of traces) {
     const name = t.connection_name ?? "";
     const net = netNumbers.get(name) ?? netNumbers.get(name.replace(/__.*$/, "")) ?? 0;
@@ -265,7 +274,7 @@ export function routesToKicad(traces, netNumbers, rules) {
       } else if (p.route_type === "wire" && i > 0 && r[i - 1].route_type === "wire" && r[i - 1].layer === p.layer) {
         const q = r[i - 1];
         if (Math.abs(q.x - p.x) < 1e-6 && Math.abs(q.y - p.y) < 1e-6) continue;
-        items.push(`\t(segment (start ${q.x.toFixed(4)} ${(-q.y).toFixed(4)}) (end ${p.x.toFixed(4)} ${(-p.y).toFixed(4)}) (width ${(p.width ?? rules.trace).toFixed(4)}) (layer "${toKicad(p.layer)}") (net ${net}) (uuid "${randomUUID()}"))`);
+        items.push(`\t(segment (start ${q.x.toFixed(4)} ${(-q.y).toFixed(4)}) (end ${p.x.toFixed(4)} ${(-p.y).toFixed(4)}) (width ${width(p, name).toFixed(4)}) (layer "${toKicad(p.layer)}") (net ${net}) (uuid "${randomUUID()}"))`);
         segments++;
       }
     }
