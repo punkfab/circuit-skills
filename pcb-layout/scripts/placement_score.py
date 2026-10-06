@@ -21,11 +21,11 @@ to a PCB:
               on the routing layers.
 
   compare     one number for comparing two placements of the SAME board (lower is better): a weighted sum
-              of log(1 + x) over ratsnest crossings per net, over-capacity area, peak congestion, pads off
-              the board, overlapping bodies and decoupling distance. The weights are fitted on 64 real
-              boards x 5 placements each, routed and judged by KiCad DRC (evals/corpus/score_study.py): on
-              boards held out of the fit it picks the placement that routes better 89% of the time, against
-              79% for peak congestion alone. It is not calibrated across different boards.
+              of log(1 + x) over over-capacity area, ratsnest crossings per net, decoupling distance, peak
+              congestion and pads off the board. The weights are fitted on 64 real boards x 5 placements
+              each, routed and judged by KiCad DRC (evals/corpus/score_study.py): on boards held out of the
+              fit it picks the placement that routes better 79% of the time, against 72% for peak
+              congestion alone. It is not calibrated across different boards.
 
 Prints a summary and the hotspots (connected over-capacity regions) with the parts in them; --json
 writes everything (the grid too) for route_eval.py --analyze; --svg writes a heat map. All numbers
@@ -188,10 +188,9 @@ PIN_WEIGHT = 1.0
 
 
 # Fitted by evals/corpus/score_analyze.py (logistic regression on log1p differences between placements of one
-# board; 494 pairs, 64 boards). Wirelength is absent on purpose: the fit wanted to reward longer wires, because
-# the machine placements in the study are compact and illegal. Refit there, then copy score_weights.json here.
-COMPARE_WEIGHTS = {'crossings_per_net': 1.7269, 'over_capacity_pct': 1.7473, 'off_board_pads': 1.405, 'decap_mm': 1.145,
-                   'congestion_max': 0.7661, 'overlaps': 0.205}
+# board; 440 pairs, 64 boards). Wirelength and body overlaps are absent on purpose: the fit gave them negative
+# weights (it would reward longer wires and more overlap). Refit there, then copy score_weights.json here.
+COMPARE_WEIGHTS = {'over_capacity_pct': 2.4111, 'crossings_per_net': 1.2884, 'decap_mm': 1.2357, 'congestion_max': 0.7325, 'off_board_pads': 0.2279}
 GROUND = re.compile(r'(^|/)(A|D|P)?(GND|VSS)\w*$', re.I)
 
 
@@ -340,7 +339,7 @@ def score(board_path, cell=1.0, pin_weight=None):
 
     it = intent(b)
     terms = {'crossings_per_net': crossings / max(1, len(signal)), 'over_capacity_pct': 100 * over / len(flat), 'off_board_pads': it['off_board_pads'],
-             'decap_mm': it['decap_mm'], 'congestion_max': flat[-1], 'overlaps': it['overlaps']}
+             'decap_mm': it['decap_mm'], 'congestion_max': flat[-1]}
     contrib = {k: round(COMPARE_WEIGHTS[k] * math.log1p(max(0.0, v)), 3) for k, v in terms.items()}
     return {
         'intent': it, 'compare': {'score': round(sum(contrib.values()), 3), 'terms': contrib},

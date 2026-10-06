@@ -1,14 +1,13 @@
 {
  "transform": "log1p",
  "weights": {
-  "crossings_per_net": 1.7269,
-  "congestion_max": 0.7661,
-  "over_capacity_pct": 1.7473,
-  "overlaps": 0.205,
-  "off_board_pads": 1.405,
-  "decap_mm": 1.145
+  "crossings_per_net": 1.2884,
+  "congestion_max": 0.7325,
+  "over_capacity_pct": 2.4111,
+  "off_board_pads": 0.2279,
+  "decap_mm": 1.2357
  },
- "pairs": 494,
+ "pairs": 440,
  "boards": 64,
- "cv_pairwise": 0.889
+ "cv_pairwise": 0.789
 }
